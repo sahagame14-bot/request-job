@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-store, must-revalidate" />
+<title>งานของฉัน — Request Job</title>
+<link rel="icon" type="image/png" href="logo.png" />
+<link rel="stylesheet" href="styles.css?v=57" />
+</head>
+<body class="app">
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <button class="sb-toggle" id="sbToggle" aria-label="ย่อ/ขยายเมนู" title="ย่อ/ขยายเมนู">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="sb-logo"><img src="logo.png" alt="KFT" /></div>
+      <div class="sb-brand">ENGINEERING</div>
+      <div class="sb-sub">Request Job System</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">เมนู</div>
+      <a class="sb-item" href="dashboard.html">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+        <span>แดชบอร์ด</span>
+      </a>
+      <div class="sb-section">งานแจ้ง</div>
+      <a class="sb-item" href="form.html">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span>
+        <span>แจ้งงานใหม่</span>
+      </a>
+      <a class="sb-item active" href="myreports.html">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
+        <span>งานของฉัน</span>
+      </a>
+      <a class="sb-item eng-only" href="tasks.html" style="display:none">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+        <span>งานที่ต้องดำเนินการ</span>
+      </a>
+      <a class="sb-item eng-only" href="report.html" style="display:none">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></span>
+        <span>รายงาน</span>
+      </a>
+      <div class="sb-section admin-only" style="display:none">ผู้ดูแลระบบ</div>
+      <a class="sb-item admin-only" href="admin.html" style="display:none">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        <span>จัดการผู้ใช้</span>
+      </a>
+    </nav>
+    <div class="sb-foot">Engineering Dept, KFT<br>&copy; 2026</div>
+  </aside>
+
+  <!-- ===== Main ===== -->
+  <div class="main">
+  <header class="topbar">
+    <button class="hamburger" id="hamburger" aria-label="เปิดเมนู">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <h2 class="page-title">งานของฉัน</h2>
+    <div class="spacer"></div>
+    <div id="notif-bell"></div>
+    <div class="who" id="who"></div>
+    <button class="btn ghost" id="logoutBtn">ออกจากระบบ</button>
+  </header>
+
+  <main class="wrap">
+    <div class="page-head">
+      <h1>งานที่ฉันแจ้ง</h1>
+      <div class="spacer"></div>
+      <a class="btn primary" href="form.html">+ แจ้งงานใหม่</a>
+    </div>
+
+    <section class="cards">
+      <div class="card c-total"><div class="n" id="c_total">0</div><div class="l">ทั้งหมด</div></div>
+      <div class="card c-pending"><div class="n" id="c_pending">0</div><div class="l">Pending</div></div>
+      <div class="card c-receive"><div class="n" id="c_receive">0</div><div class="l">Receive</div></div>
+      <div class="card c-waiting"><div class="n" id="c_waiting">0</div><div class="l">Waiting</div></div>
+      <div class="card c-finish"><div class="n" id="c_finish">0</div><div class="l">Finish</div></div>
+      <div class="card c-cancel"><div class="n" id="c_cancel">0</div><div class="l">Cancel</div></div>
+    </section>
+
+    <div id="filterbar"></div>
+
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th style="width:100px;">Date</th>
+            <th style="width:128px;">REC.NO</th>
+            <th>Subject</th>
+            <th style="width:130px;">Name</th>
+            <th style="width:110px;">Position</th>
+            <th style="width:110px;">Section</th>
+            <th style="width:100px;">Due Date</th>
+            <th style="width:110px;">Status</th>
+            <th style="width:150px;">ไฟล์ PDF</th>
+            <th style="width:80px;">จัดการ</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td class="empty" colspan="10">กำลังโหลด…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="pagination"></div>
+    <input type="file" id="pdfInput" accept="application/pdf" hidden>
+  </main>
+  </div><!-- /.main -->
+
+  <div class="sb-backdrop" id="sbBackdrop"></div>
+
+<script src="filters.js?v=2"></script>
+<script src="notifications.js?v=2"></script>
+<script>
+  const STATUS_TH = { pending:'Pending', receive:'Receive', waiting:'Waiting', finish:'Finish', cancel:'Cancel' };
+  const fmtDate = d => { if (!d) return '—'; const dt = new Date(d); return `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}/${dt.getFullYear()}`; };
+  const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  fetch('api/me.php').then(async r => {
+    if (!r.ok) { location.href = 'index.html'; return; }
+    const { user } = await r.json();
+    document.getElementById('who').innerHTML =
+      `<b>${esc(user.name)}</b><br>${esc(user.department||'')} · ${user.role}`;
+    if (['engineer','admin'].includes(user.role))
+      document.querySelectorAll('.eng-only').forEach(el => el.style.display = '');
+    if (user.role === 'admin')
+      document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+    NotifBell.init({ mount: '#notif-bell' });
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch('api/logout.php'); location.href = 'index.html';
+  });
+
+  const rowsEl = document.getElementById('rows');
+  let timer = null;
+  let curPage = 1, curPerPage = 10;
+
+  async function load(resetPage = true) {
+    if (resetPage) curPage = 1;
+    const f = FilterBar.state();
+    const url = `api/request_list.php?mine=1&q=${encodeURIComponent(f.q)}&status=${encodeURIComponent(f.status)}`
+              + `&date_from=${f.date_from}&date_to=${f.date_to}&sort=${f.sort}`
+              + `&page=${curPage}&per_page=${curPerPage}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) { location.href = 'index.html'; return; }
+      const { rows, counts, total, pages } = await res.json();
+      document.getElementById('c_total').textContent = counts.total ?? 0;
+      document.getElementById('c_pending').textContent = counts.pending ?? 0;
+      document.getElementById('c_receive').textContent = counts.receive ?? 0;
+      document.getElementById('c_waiting').textContent = counts.waiting ?? 0;
+      document.getElementById('c_finish').textContent = counts.finish ?? 0;
+      document.getElementById('c_cancel').textContent = counts.cancel ?? 0;
+
+      if (!rows.length) {
+        document.getElementById('pagination').innerHTML = '';
+        rowsEl.innerHTML = '<tr><td class="empty" colspan="10">คุณยังไม่ได้แจ้งงาน — กด "+ แจ้งงานใหม่" เพื่อเริ่ม</td></tr>';
+        return;
+      }
+      renderPagination(total, pages);
+      rowsEl.innerHTML = rows.map(r => `
+        <tr onclick="location.href='form.html?id=${r.id}'">
+          <td>${fmtDate(r.req_date)}</td>
+          <td class="rec">${esc(r.rec_no)}</td>
+          <td class="wrap">${esc(r.subject) || '<span style=color:#9aa0a6>(ไม่มีหัวข้อ)</span>'}</td>
+          <td>${esc(r.req_name)||'—'}</td>
+          <td>${esc(r.position)||'—'}</td>
+          <td>${esc(r.section)||'—'}</td>
+          <td>${fmtDate(r.due_date)}</td>
+          <td><span class="badge ${r.status}">${STATUS_TH[r.status]||r.status}</span></td>
+          <td>${pdfCell(r)}</td>
+          <td>${actionCell(r)}</td>
+        </tr>`).join('');
+    } catch {
+      rowsEl.innerHTML = '<tr><td class="empty" colspan="10">เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</td></tr>';
+    }
+  }
+
+  // ----- PDF attach (owner may attach ≤3MB; saved via request_attach.php) -----
+  const MAX_PDF_MB = 3;
+  let attachTargetId = null;
+  function pdfCell(r){
+    if (r.pdf_path) {
+      return `<div style="display:flex;align-items:center;gap:6px;white-space:nowrap;">`+
+             `<a href="${esc(r.pdf_path)}" target="_blank" onclick="event.stopPropagation()" `+
+             `style="color:#16a34a;font-weight:700;text-decoration:none;font-size:13px;">ดู</a>`+
+             `<button type="button" onclick="event.stopPropagation();attachPdf(${r.id})" `+
+             `style="border:1px solid var(--line);background:#fff;border-radius:7px;padding:3px 8px;font:inherit;font-size:12px;cursor:pointer;">เปลี่ยน</button>`+
+             `</div>`;
+    }
+    return `<button type="button" onclick="event.stopPropagation();attachPdf(${r.id})" `+
+           `style="border:1px solid #1d4ed8;background:#eff6ff;color:#1d4ed8;border-radius:7px;padding:4px 10px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">📎 แนบ PDF</button>`;
+  }
+  // ----- delete: the owner may remove their own job while it is still Pending -----
+  function actionCell(r){
+    if (r.status !== 'pending') return '<span style="color:#cbd5e1">—</span>';
+    return `<button type="button" title="ลบงาน" onclick="event.stopPropagation();deleteRequest(${r.id},'${esc(r.rec_no)}')" `+
+           `style="border:1px solid #fecaca;background:#fef2f2;color:#dc2626;border-radius:7px;padding:4px 10px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">🗑 ลบ</button>`;
+  }
+  window.deleteRequest = async function(id, recNo){
+    if (!confirm(`ต้องการลบงาน ${recNo} ใช่หรือไม่?\n(ลบได้เฉพาะงานที่ยังเป็น Pending — กู้คืนไม่ได้)`)) return;
+    try {
+      const res = await fetch('api/request_delete.php', {
+        method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ id })
+      });
+      const d = await res.json();
+      if (res.ok) load(false);
+      else alert(d.error || 'ลบไม่สำเร็จ');
+    } catch { alert('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้'); }
+  };
+
+  window.attachPdf = function(id){ attachTargetId = id; const i = document.getElementById('pdfInput'); i.value = ''; i.click(); };
+  document.getElementById('pdfInput').addEventListener('change', async e => {
+    const f = e.target.files[0]; if (!f || !attachTargetId) return;
+    if (f.type !== 'application/pdf') { alert('กรุณาเลือกไฟล์ PDF'); return; }
+    if (f.size > MAX_PDF_MB * 1024 * 1024) {
+      alert(`ไฟล์ใหญ่เกิน ${MAX_PDF_MB}MB (${(f.size/1024/1024).toFixed(1)}MB) — กรุณาเลือกไฟล์ที่เล็กลง`); return;
+    }
+    try {
+      const fd = new FormData(); fd.append('file', f);
+      const up = await fetch('api/upload.php', { method:'POST', body:fd });
+      const ud = await up.json();
+      if (!up.ok) { alert(ud.error || 'อัปโหลดไม่สำเร็จ'); return; }
+      const at = await fetch('api/request_attach.php', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id: attachTargetId, pdf_path: ud.path })
+      });
+      const ad = await at.json();
+      if (!at.ok) { alert(ad.error || 'แนบไฟล์ไม่สำเร็จ'); return; }
+      load(false);
+    } catch { alert('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้'); }
+  });
+
+  function renderPagination(total, pages) {
+    const el = document.getElementById('pagination');
+    const opts = [10, 20, 50, 100].map(n =>
+      `<option value="${n}"${n === curPerPage ? ' selected' : ''}>${n} แถว</option>`).join('');
+    let btns = `<button class="pag-btn" ${curPage<=1?'disabled':''} onclick="goPage(${curPage-1})">‹</button>`;
+    if (pages > 1) {
+      const show = new Set([1, pages, curPage-1, curPage, curPage+1].filter(p => p>=1 && p<=pages));
+      let prev = 0;
+      [...show].sort((a,b)=>a-b).forEach(p => {
+        if (prev && p - prev > 1) btns += `<span class="pag-info">…</span>`;
+        btns += `<button class="pag-btn${p===curPage?' active':''}" onclick="goPage(${p})">${p}</button>`;
+        prev = p;
+      });
+    }
+    btns += `<button class="pag-btn" ${curPage>=pages?'disabled':''} onclick="goPage(${curPage+1})">›</button>`;
+    el.innerHTML = `<div class="pagination">
+      ${btns}
+      <span class="pag-info">${total} รายการ</span>
+      <select class="pag-perpage" onchange="changePerPage(this.value)">${opts}</select>
+    </div>`;
+  }
+  window.goPage = function(p){ curPage = p; load(false); };
+  window.changePerPage = function(v){ curPerPage = +v; load(true); };
+
+  FilterBar.init({ mount:'#filterbar', status:true, onChange:() => load(true) });
+  load(true);
+
+  // ----- sidebar collapse / drawer -----
+  const body = document.body;
+  if (localStorage.getItem('sb-collapsed') === '1') body.classList.add('sidebar-collapsed');
+  document.getElementById('sbToggle').addEventListener('click', () => {
+    body.classList.toggle('sidebar-collapsed');
+    localStorage.setItem('sb-collapsed', body.classList.contains('sidebar-collapsed') ? '1' : '0');
+  });
+  document.getElementById('hamburger').addEventListener('click', () => body.classList.toggle('sidebar-open'));
+  document.getElementById('sbBackdrop').addEventListener('click', () => body.classList.remove('sidebar-open'));
+</script>
+</body>
+</html>

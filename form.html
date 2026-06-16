@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-store, must-revalidate" />
+<title>Request Job — Production Engineer & IT</title>
+<link rel="icon" type="image/png" href="logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1f2937;
+    --line:#7a7a7a;
+    --line-soft:#b9b9b9;
+    --fill:#ffffff;          /* fillable cell (white — was light-blue) */
+    --head:#d9d9d9;          /* grey header band */
+    --accent:#1d4ed8;
+    --accent2:#0ea5e9;
+    --radio:#333;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:
+      radial-gradient(900px 500px at 12% -8%, rgba(59,130,246,.22), transparent),
+      radial-gradient(900px 600px at 110% 8%, rgba(14,165,233,.18), transparent),
+      linear-gradient(160deg,#0f172a 0%,#1e293b 55%,#334155 100%);
+    background-attachment:fixed;
+    font-family:"Sarabun","Tahoma","Segoe UI",Arial,sans-serif;
+    color:var(--ink);
+    font-size:12.5px;
+    padding:22px 0 70px;
+    -webkit-font-smoothing:antialiased;
+    counter-reset:pageno;
+  }
+
+  /* ---------- Toolbar (screen only) — glass ---------- */
+  .toolbar{
+    max-width:820px; margin:0 auto 20px; display:flex; gap:10px;
+    align-items:center; justify-content:flex-end;
+    position:sticky; top:14px; z-index:50;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.18);
+    backdrop-filter:blur(14px) saturate(140%);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    padding:10px 14px; border-radius:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,.28);
+    animation:dropIn .5s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .toolbar .title{
+    margin-right:auto; font-weight:800; font-size:15px; letter-spacing:.2px;
+    background:linear-gradient(90deg,#fff,#cfe4ff);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:42%;
+  }
+  .btn{
+    border:none; border-radius:11px; padding:9px 16px; font-size:13px; font-weight:700;
+    cursor:pointer; background:rgba(255,255,255,.92); color:#1f2937;
+    display:inline-flex; gap:7px; align-items:center; font-family:inherit;
+    transition:transform .12s ease, box-shadow .2s ease, background .2s ease, filter .2s;
+    box-shadow:0 4px 12px rgba(0,0,0,.18);
+  }
+  .btn:hover{ transform:translateY(-2px); box-shadow:0 9px 22px rgba(0,0,0,.28); }
+  .btn:active{ transform:translateY(0) scale(.97); }
+  .btn.primary{ background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  .btn.primary:hover{ filter:brightness(1.08); }
+
+  /* ---------- A4 sheet ---------- */
+  .sheet{
+    counter-increment:pageno;
+    width:820px; margin:0 auto 26px; background:#fff; position:relative;
+    padding:16px 18px; border-radius:14px;
+    box-shadow:0 18px 50px rgba(0,0,0,.4), 0 2px 6px rgba(0,0,0,.2);
+    animation:riseIn .6s cubic-bezier(.2,.8,.2,1) both;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .sheet:hover{ transform:translateY(-3px); box-shadow:0 26px 60px rgba(0,0,0,.45); }
+  .sheet:nth-of-type(2){ animation-delay:.08s; }
+  .sheet:nth-of-type(3){ animation-delay:.16s; }
+  /* page badge (screen only) */
+  .sheet::before{
+    content:"PAGE " counter(pageno);
+    position:absolute; top:14px; left:-11px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff;
+    font-size:10px; font-weight:800; letter-spacing:.6px;
+    padding:4px 11px 4px 13px; border-radius:6px 6px 6px 0;
+    box-shadow:0 6px 14px rgba(29,78,216,.45);
+  }
+  .sheet::after{ /* little fold under the badge */
+    content:""; position:absolute; top:31px; left:-11px;
+    border:6px solid transparent; border-top-color:#0b3a8f; border-right-color:#0b3a8f;
+  }
+  .sheet.no-badge::before, .sheet.no-badge::after{ display:none; }
+
+  table.form{ width:100%; border-collapse:collapse; table-layout:fixed; }
+  table.form td{ border:1px solid var(--line); padding:3px 5px; vertical-align:top; }
+
+  .noborder td, td.noborder{ border:none !important; }
+
+  /* sheet title bar */
+  .sheet-title{
+    text-align:center; font-weight:800; font-size:16px; letter-spacing:.4px;
+    padding:9px 4px; border:1px solid var(--line); border-bottom:none;
+    background:linear-gradient(180deg,#f4f8ff,#ffffff);
+    position:relative; overflow:hidden;
+  }
+  .sheet-title::after{ /* gradient accent underline */
+    content:""; position:absolute; left:0; right:0; bottom:0; height:3px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent));
+    background-size:200% 100%; animation:slide 4s linear infinite;
+  }
+  .sheet-title .printout{
+    float:right; color:var(--accent); font-weight:800; text-decoration:none;
+    font-size:12.5px; cursor:pointer; padding:2px 9px; border-radius:7px;
+    background:rgba(29,78,216,.10); transition:background .2s, transform .12s;
+  }
+  .sheet-title .printout:hover{ background:rgba(29,78,216,.20); transform:translateY(-1px); }
+
+  /* bilingual label */
+  .lbl{ font-weight:700; line-height:1.15; }
+  .lbl small{ display:block; font-weight:400; color:#555; font-size:10.5px; }
+
+  /* fillable */
+  .fill{ background:var(--fill); transition:background .2s; }
+  input.f,textarea.f,select.f{
+    width:100%; border:none; background:transparent; font:inherit; color:#000000;
+    padding:2px 3px; outline:none; resize:none; border-radius:4px;
+    transition:background .18s, box-shadow .18s;
+  }
+  input.f::placeholder,textarea.f::placeholder{ color:#9aa0a6; }
+  input.f:focus,textarea.f:focus,select.f:focus{
+    background:#ffffff;
+    box-shadow:inset 0 -2px 0 0 var(--accent), 0 0 0 2px rgba(29,78,216,.18);
+  }
+  textarea.f{ min-height:18px; }
+
+  /* OPERATION DETAIL — ruled writing lines (like the paper form) */
+  #operationDetail{
+    line-height:28px;
+    padding:6px 8px 0;
+    background-image:repeating-linear-gradient(to bottom,
+        transparent 0, transparent 27px, var(--line) 27px, var(--line) 28px);
+    background-attachment:local;     /* lines scroll together with the text */
+    background-position:0 6px;       /* align first rule with the first text line */
+  }
+
+  .band{
+    background:linear-gradient(180deg,#e4e7ec,#d3d7de); text-align:center; font-weight:800;
+    letter-spacing:.5px; color:#374151;
+  }
+
+  /* EN / IT toggle */
+  .langtoggle{ display:flex; flex-direction:column; gap:3px; }
+  .langtoggle button{
+    border:1px solid var(--line-soft); background:#f1f3f6; font-weight:800; font-size:10px;
+    padding:2px 9px; cursor:pointer; color:#555; border-radius:5px;
+    transition:transform .12s, background .2s, color .2s, box-shadow .2s; font-family:inherit;
+  }
+  .langtoggle button:hover{ transform:translateY(-1px); }
+  .langtoggle button.on{
+    background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff;
+    border-color:transparent; box-shadow:0 4px 10px rgba(29,78,216,.4);
+  }
+
+  /* dotted writing lines */
+  .lines{ width:100%; }
+  .lines .line{ border-bottom:1px dotted var(--line-soft); height:20px; }
+
+  /* picture drop zone */
+  .picbox{
+    height:210px; border:2px dashed var(--line-soft); border-radius:10px; position:relative;
+    display:flex; align-items:center; justify-content:center; color:#9aa0a6;
+    background:linear-gradient(180deg,#fbfdff,#f4f7fb); cursor:pointer; overflow:hidden;
+    transition:border-color .2s, background .2s, transform .2s, box-shadow .2s;
+  }
+  .picbox:hover{
+    border-color:var(--accent); color:var(--accent); transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(29,78,216,.18); background:#f3f8ff;
+  }
+  .picbox img{ max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; display:block; border-radius:6px; }
+  .pic-insert{ position:absolute; top:16px; right:20px; z-index:2;
+    background:#fff; color:#1d4ed8; border:1px solid #1d4ed8; font-weight:700; }
+  .picbox .hint{ font-size:11.5px; font-weight:500; }
+
+  /* equipment table */
+  table.eq{ width:100%; border-collapse:collapse; }
+  table.eq th,table.eq td{ border:1px solid var(--line); padding:3px 5px; }
+  table.eq th{ background:linear-gradient(180deg,#eef1f5,#e3e7ec); font-weight:800; color:#374151; }
+  table.eq .c-no{ width:42px; text-align:center; }
+  table.eq .c-qty{ width:60px; text-align:center; }
+  table.eq tbody tr,table.eq tbody tr{ transition:background .15s; }
+  table.eq tbody tr:hover{ background:#f4f8ff; }
+
+  /* radio rows */
+  .radio-row{ display:flex; align-items:flex-start; gap:8px; margin:7px 0; }
+  .radio-row .dot{
+    width:16px; height:16px; border:2px solid var(--radio); border-radius:50%;
+    flex:0 0 auto; margin-top:1px; cursor:pointer; position:relative;
+    transition:border-color .18s, box-shadow .18s, transform .12s;
+  }
+  .radio-row .dot:hover{ border-color:var(--accent); transform:scale(1.1); }
+  .radio-row .dot.on{
+    border-color:var(--accent);
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    box-shadow:0 0 0 3px rgba(29,78,216,.16);
+  }
+  /* checkmark when selected */
+  .radio-row .dot.on::after{
+    content:""; position:absolute; left:4px; top:1px; width:4px; height:8px;
+    border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg);
+    animation:checkpop .22s cubic-bezier(.2,1.4,.4,1);
+  }
+  @keyframes checkpop{ from{ transform:rotate(45deg) scale(0); } to{ transform:rotate(45deg) scale(1); } }
+
+  /* signature row */
+  .sign td{ height:46px; text-align:center; vertical-align:bottom; }
+  .sign .who{ font-weight:700; border-top:1px solid var(--line); }
+
+  .footer-row td{ font-weight:700; }
+
+  /* notice shown to non-engineer requesters (this section is read-only for them) */
+  .eng-notice{
+    border:1px solid #fcd34d; border-top:none; background:#fffbeb; color:#92400e;
+    font-weight:700; text-align:center; padding:7px 10px; font-size:12.5px;
+  }
+  .eng-notice small{ display:block; font-weight:400; color:#b45309; font-size:10.5px; }
+
+  /* uniform BLACK grid for the whole ENGINEER section (single 1px lines) */
+  .eng-section{ margin-top:8px; }
+  .eng-section .sheet-title{ border-color:#000; }
+  .eng-section table.form > tbody > tr > td,
+  .eng-section table.form > tr > td,
+  .eng-section table.eq th,
+  .eng-section table.eq td{ border-color:#000; }
+  .eng-section .footer-tbl{ margin-top:-1px; }   /* overlap main table's bottom line → single 1px */
+  .eng-section .footer-tbl > tbody > tr > td,
+  .eng-section .footer-tbl > tr > td{ padding:4px 6px; }
+  .eng-section .foot-sig{ height:40px; }
+  /* fixed signature images placed in Issue / Check / Approve on every sheet */
+  .foot-sig{ text-align:center; vertical-align:middle; }
+  .foot-sig .sig{ max-height:38px; max-width:96%; object-fit:contain; vertical-align:middle; }
+  /* cell holds a nested table = the cell is the frame; nested table draws only inner lines */
+  .eng-section .cellframe table.eq tr:first-child > th{ border-top:none; }
+  .eng-section .cellframe table.eq th:first-child,
+  .eng-section .cellframe table.eq td:first-child{ border-left:none; }
+  .eng-section .cellframe table.eq th:last-child,
+  .eng-section .cellframe table.eq td:last-child{ border-right:none; }
+  /* CHECK/ENG/APPROVE/ASST boxes (table.form inside the cell) */
+  .eng-section td.cellframe > table.form > tbody > tr:first-child > td{ border-top:none; }
+  .eng-section td.cellframe > table.form > tbody > tr:last-child > td{ border-bottom:none; }
+  .eng-section td.cellframe > table.form > tbody > tr > td:first-child{ border-left:none; }
+  .eng-section td.cellframe > table.form > tbody > tr > td:last-child{ border-right:none; }
+
+  /* ── merged ENGINEER block: schedule/status info (left) + signature boxes
+     (right) inside ONE framed cell — was two separate columns ── */
+  .eng-merged{ display:flex; align-items:stretch; height:100%; min-height:230px; }
+  .em-info{ flex:1; min-width:0; padding:2px 8px 4px 6px; }
+  /* signature column floats — no divider line, a little breathing room */
+  .em-sign{ flex:0 0 112px; width:112px; padding:2px 4px; }
+
+  /* CHECK/ENG. + APPROVE/ASST·MGR — two compact signature blocks with small
+     boxes, pushed to top & bottom to fill the column like the Excel form. */
+  .signcol{ display:flex; flex-direction:column; justify-content:space-between;
+            height:100%; min-height:0; background:#fff; }
+  /* each signature group is its own framed box (Excel-style); the white
+     signing area is divided from the grey labels by a line, top & bottom. */
+  .signcol .sgrp{ border:1px solid #000; }
+  .signcol .cap, .signcol .sub{ padding:2px 4px; text-align:center; white-space:nowrap;
+            font-size:11px; line-height:1.3; }
+  .signcol .cap{ background:linear-gradient(180deg,#e4e7ec,#d3d7de);
+            font-weight:800; letter-spacing:.4px; color:#374151; border-bottom:1px solid #000; }
+  .signcol .sub{ background:#d9d9d9; font-weight:700; color:#374151; border-top:1px solid #000; }
+  .signcol .sbox{ height:46px; background:#fff; }
+
+  /* approve boxes */
+  .approve{ text-align:center; }
+  .approve .cap{ font-weight:800; background:linear-gradient(180deg,#e4e7ec,#d3d7de); }
+  .approve .sigspace{ height:56px; }
+
+  /* ---------- keyframes ---------- */
+  @keyframes riseIn{ from{ opacity:0; transform:translateY(26px) scale(.985); } to{ opacity:1; transform:none; } }
+  @keyframes dropIn{ from{ opacity:0; transform:translateY(-14px); } to{ opacity:1; transform:none; } }
+  @keyframes slide{ to{ background-position:200% 0; } }
+  @keyframes pop{ from{ transform:scale(0); } to{ transform:scale(1); } }
+  @media (prefers-reduced-motion:reduce){ *{ animation:none !important; transition:none !important; } }
+
+  /* ---------- Print (clean official document, fit ONE A4) ---------- */
+  @media print{
+    @page{ size:A4 portrait; margin:6mm; }
+    html,body{ width:210mm; }
+    body{
+      background:#fff; padding:0; font-size:9px; line-height:1.2;
+      font-family:"Sarabun","Tahoma",Arial,sans-serif;
+      -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    }
+    .toolbar, #toast{ display:none !important; }
+    /* hide screen-only controls in the printout */
+    .langtoggle, .sheet-title .printout, td .btn, .screen-only{ display:none !important; }
+
+    /* keep the whole document on a single page */
+    .sheet{
+      width:100%; margin:0; padding:0; border:none; border-radius:0;
+      box-shadow:none; animation:none; page-break-inside:avoid;
+    }
+    .sheet:hover{ transform:none; box-shadow:none; }
+    .sheet::before, .sheet::after, .sheet-title::after{ display:none !important; }
+    section, table.form, table.eq{ page-break-inside:avoid; }
+
+    /* tighter sizing so all 3 sections fit one A4 */
+    table.form td{ padding:1px 4px; }
+    .sheet-title{ background:#fff; font-size:11px; padding:4px 4px; }
+    .lbl small{ font-size:7.5px; }
+    input.f, textarea.f, select.f{ padding:0 2px; }
+    textarea.f{ min-height:13px; }
+    #detail{ height:124px; }             /* section 1 expander */
+    .picbox{ height:224px; }             /* section 2 — picture */
+    #operationDetail{ height:176px; }    /* section 3 — engineer (bigger) */
+    .approve .sigspace{ height:54px; }
+    .eng-merged{ min-height:0; }          /* merged schedule+signature block */
+    .em-sign{ flex-basis:104px; width:104px; }
+    .signcol .sbox{ height:40px; }        /* CHECK/ENG. & APPROVE/ASST signing space */
+    .sign td{ height:50px; }
+    .foot-sig .sig{ max-height:34px; }
+    table.eq th, table.eq td{ padding:2px 4px; }
+    table.eq tbody tr{ height:27px; }
+    .radio-row{ margin:4px 0; }
+    table.form[style*="margin-top:8px"]{ margin-top:4px !important; }
+
+    .sheet-title{ background:#fff !important; }
+    .band, .approve .cap, table.eq th{ background:#e4e4e4 !important; }
+    .fill{ background:#fff !important; }
+    input.f:focus,textarea.f:focus,select.f:focus{ background:transparent; box-shadow:none; }
+    .fb-cal{ display:none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===== Toolbar (screen only) ===== -->
+  <div class="toolbar">
+    <span class="title" id="docTitle">Request Job — Production Engineer &amp; IT</span>
+    <button class="btn" id="backBtn">← กลับ</button>
+    <button class="btn" id="saveBtn">💾 บันทึกเป็น PDF</button>
+    <button class="btn primary" onclick="safePrint()">🖨 Print Out</button>
+  </div>
+  <div id="toast" style="display:none;position:fixed;top:18px;left:50%;transform:translateX(-50%);
+       z-index:999;padding:11px 20px;border-radius:9px;color:#fff;font-weight:600;font-size:14px;
+       box-shadow:0 8px 24px rgba(0,0,0,.25);"></div>
+
+  <!-- =========================================================
+       Z-PE-003 — single A4 sheet (REQUEST + ENGINEER sections)
+  ========================================================== -->
+  <div class="sheet no-badge">
+
+   <!-- ===== top section: REQUEST (filled by requester) ===== -->
+   <section id="part1">
+    <div class="sheet-title">
+      <span class="printout" onclick="safePrint()">Print Out</span>
+      REQUEST JOB OF PRODUCTION ENGINEER &amp; IT
+    </div>
+
+    <table class="form">
+      <colgroup>
+        <col style="width:86px"><col style="width:108px"><col style="width:86px">
+        <col style="width:108px"><col><col style="width:60px"><col style="width:140px">
+      </colgroup>
+
+      <!-- DATE / lang / section / rec no -->
+      <tr>
+        <td class="lbl">DATE<small>วันที่</small></td>
+        <td class="fill" colspan="2" style="white-space:nowrap;">
+          <input class="f" type="date" id="reqDate" lang="en-GB" style="width:128px;display:inline-block;vertical-align:middle;">
+          <div class="langtoggle" style="display:inline-flex;vertical-align:middle;margin-left:8px;">
+            <button type="button" class="on" data-lang="EN">EN</button>
+            <button type="button" data-lang="IT">IT</button>
+          </div>
+        </td>
+        <td class="lbl">For Section<small>ส่วนงาน</small></td>
+        <td class="fill">
+          <select class="f" id="forSection">
+            <option>IT</option>
+            <option>Production Engineer</option>
+          </select>
+        </td>
+        <td class="lbl" style="text-align:right;">REC.No</td>
+        <td class="fill"><input class="f" id="recNo" value="RJE-20260041" readonly></td>
+      </tr>
+
+      <!-- SUBJECT -->
+      <tr>
+        <td class="lbl">SUBJECT<small>เรื่องที่แจ้ง</small></td>
+        <td class="fill" colspan="4"><input class="f" id="subject"></td>
+        <td class="band" colspan="2">CHECK</td>
+      </tr>
+
+      <!-- NAME / POSITION / SECTION -->
+      <tr>
+        <td class="lbl">NAME<small>ชื่อผู้แจ้ง</small></td>
+        <td class="fill"><input class="f" id="reqName"></td>
+        <td class="lbl">POSITION<small>ตำแหน่ง</small></td>
+        <td class="fill" colspan="2"><input class="f" id="position"></td>
+        <td colspan="2" rowspan="3" class="approve" style="vertical-align:top;">
+          <div class="sigspace"></div>
+          <div style="border-top:1px solid var(--line); text-align:left; padding-top:2px;">
+            <strong>DATE</strong>
+          </div>
+          <div class="cap" style="margin-top:4px;">Section Ass./ MGR</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">SECTION<small>แผนก</small></td>
+        <td class="fill"><input class="f" id="section"></td>
+        <td class="lbl">DUE DATE<small>วันที่ต้องการ</small></td>
+        <td class="fill" colspan="2"><input class="f" type="date" id="dueDate" lang="en-GB"></td>
+      </tr>
+      <tr>
+        <td class="lbl">DETAIL<small>รายละเอียดงาน</small></td>
+        <td class="fill" colspan="4"><textarea class="f" rows="5" id="detail"></textarea></td>
+      </tr>
+
+      <!-- PICTURE PROBLEM -->
+      <tr>
+        <td class="band" colspan="7">PICTURE PROBLEM &nbsp; แสดงรูปภาพ (ถ้ามี)</td>
+      </tr>
+      <tr>
+        <td colspan="7" style="padding:6px; position:relative;">
+          <div class="picbox" id="picbox" onclick="document.getElementById('picInput').click()">
+            <span class="hint">คลิกเพื่อแนบรูปภาพ / Click to insert pictures</span>
+          </div>
+          <input type="file" id="picInput" accept="image/*" hidden>
+          <button class="btn pic-insert" type="button"
+                  onclick="event.stopPropagation();document.getElementById('picInput').click()">Insert Pictures</button>
+        </td>
+      </tr>
+    </table>
+   </section>
+
+   <!-- ===== bottom section: FOR PRODUCTION ENGINEER & IT (filled by engineer) ===== -->
+   <section id="part2" class="eng-section">
+    <div class="sheet-title">FOR PRODUCTION ENGINEER &amp; IT</div>
+    <div id="engNotice" class="eng-notice screen-only" hidden>
+      🔒 ส่วนนี้กรอกได้เฉพาะเจ้าหน้าที่ <strong>Engineer / IT</strong> หรือ <strong>Admin</strong> เท่านั้น
+      <small>(This section is for Engineer / IT staff only)</small>
+    </div>
+
+    <table class="form">
+      <colgroup>
+        <col style="width:46%"><col style="width:32%"><col style="width:22%">
+      </colgroup>
+
+      <!-- OPERATION DETAIL (spans 2 cols) + APPROVE (right) -->
+      <tr>
+        <td colspan="2">
+          <div class="lbl" style="margin-bottom:3px;">OPERATION DETAIL<small>รายละเอียดการดำเนินงาน</small></div>
+          <div class="fill" style="border:1px solid var(--line);">
+            <textarea class="f eng" id="operationDetail" rows="8" style="color:#000000;min-height:150px"></textarea>
+          </div>
+        </td>
+        <td class="approve" style="vertical-align:top;">
+          <div class="cap">APPROVE</div>
+          <div class="sigspace"></div>
+          <div style="border-top:1px solid var(--line); text-align:left; padding:2px 0;"><strong>DATE :</strong></div>
+          <div class="cap">ASST / MGR.</div>
+          <div style="font-size:10px;">Engineering Department</div>
+        </td>
+      </tr>
+
+      <!-- Equipment | (schedule/status + CHECK·APPROVE signatures, merged) -->
+      <tr>
+        <td class="cellframe" style="vertical-align:top; padding:0;">
+          <table class="eq">
+            <tr><th colspan="3">อุปกรณ์ที่ต้องการซื้อ &nbsp; EQUIPMENT TO ORDER</th></tr>
+            <tr><th class="c-no">ลำดับ</th><th>รายการ</th><th class="c-qty">จำนวน</th></tr>
+            <!-- generated rows -->
+            <tbody id="eqBody"></tbody>
+          </table>
+        </td>
+        <td colspan="2" class="eng-mergecell" style="vertical-align:top; padding:0;">
+          <div class="eng-merged">
+            <!-- left: schedule / status info -->
+            <div class="em-info">
+              <p style="margin:3px 0;"><strong>DATE :</strong> <small>วันที่รับแจ้ง</small><br>
+                <input class="f eng" type="date" id="dateReceived" lang="en-GB" style="width:118px;border-bottom:1px dotted var(--line-soft);color:#000000"></p>
+              <p style="margin:8px 0;"><strong>Schedule Date :</strong> <small>กำหนดการ</small><br>
+                <input class="f eng" type="date" id="scheduleDate" lang="en-GB" style="width:118px;border-bottom:1px dotted var(--line-soft);color:#000000"></p>
+              <p style="margin:8px 0;"><strong>Finish Date :</strong> <small>วันที่เสร็จ</small><br>
+                <input class="f eng" type="date" id="finishDate" lang="en-GB" style="width:118px;border-bottom:1px dotted var(--line-soft);color:#000000"></p>
+
+              <div class="radio-row">
+                <span class="dot" data-radio="sched" data-val="on_schedule"></span>
+                <span><strong>On Schedule</strong><br><small>ตามกำหนดเวลา</small></span>
+              </div>
+              <div class="radio-row">
+                <span class="dot" data-radio="sched" data-val="no_schedule"></span>
+                <span style="flex:1"><strong>No Schedule&nbsp; Cause :</strong>
+                  <input class="f eng" id="scheduleCause" style="border-bottom:1px dotted var(--line-soft);color:#000000">
+                  <br><small>ไม่ตามกำหนดเวลา</small></span>
+              </div>
+
+              <p style="margin:10px 0 2px;"><strong>Status :</strong>
+                <input class="f eng" id="resultStatus" style="width:150px;border-bottom:1px dotted var(--line-soft);color:#000000"></p>
+              <!-- workflow status is managed from the job list; kept hidden so a
+                   save round-trips the current status instead of resetting it -->
+              <select id="statusSel" hidden>
+                <option value="pending">Pending</option>
+                <option value="receive">Receive</option>
+                <option value="waiting">Waiting</option>
+                <option value="finish">Finish</option>
+                <option value="cancel">Cancel</option>
+              </select>
+            </div>
+            <!-- right: signature boxes (CHECK/ENG. + APPROVE/ASST·MGR.) -->
+            <div class="em-sign">
+              <div class="signcol">
+                <div class="sgrp">
+                  <div class="cap">CHECK</div>
+                  <div class="sbox"></div>
+                  <div class="sub">ENG.</div>
+                </div>
+                <div class="sgrp">
+                  <div class="cap">APPROVE</div>
+                  <div class="sbox"></div>
+                  <div class="sub">ASST / MGR.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- signatures -->
+    <table class="form footer-tbl" style="table-layout:fixed;">
+      <colgroup><col><col style="width:78px"><col style="width:78px"><col style="width:78px"></colgroup>
+      <tr class="footer-row">
+        <td rowspan="2" style="vertical-align:top; font-weight:700;">
+          KATSUYAMA FINTECH (THAILAND CO.,LTD)
+          <div style="margin-top:20px;">ENGINEERING DEPARTMENT</div>
+        </td>
+        <td class="foot-sig"><img class="sig" src="assets/signatures/issue.png" alt="" onerror="this.style.display='none'"></td>
+        <td class="foot-sig"><img class="sig" src="assets/signatures/check.png" alt="" onerror="this.style.display='none'"></td>
+        <td class="foot-sig"><img class="sig" src="assets/signatures/approve.png" alt="" onerror="this.style.display='none'"></td>
+      </tr>
+      <tr class="footer-row">
+        <td style="text-align:center; font-weight:700;">Issue</td>
+        <td style="text-align:center; font-weight:700;">Check</td>
+        <td style="text-align:center; font-weight:700;">Approve</td>
+      </tr>
+      <tr class="footer-row">
+        <td colspan="4" style="text-align:right; font-weight:700;">Document No. Z-PE-003</td>
+      </tr>
+    </table>
+   </section>
+
+  </div><!-- /.sheet -->
+
+<script src="datepicker.js?v=1"></script>
+<script>
+  const $  = id => document.getElementById(id);
+  const PAGE1 = document.getElementById('part1');   // REQUEST section (requester)
+  const PAGE2 = document.getElementById('part2');   // ENGINEER section (engineer/IT)
+  const params   = new URLSearchParams(location.search);
+  const reqId    = params.get('id');           // null => new request
+  let role = 'user', picturePath = '', dirty = false;
+
+  function toast(msg, ok = true){
+    const t = $('toast');
+    t.textContent = msg; t.style.background = ok ? '#16a34a' : '#dc2626'; t.style.display = 'block';
+    clearTimeout(t._t); t._t = setTimeout(() => t.style.display = 'none', 2600);
+  }
+
+  // ----- equipment rows (10) -----
+  const eqBody = $('eqBody');
+  for (let i = 1; i <= 10; i++){
+    eqBody.insertAdjacentHTML('beforeend',
+      `<tr><td class="c-no">${i}</td>`+
+      `<td><input class="f eq-item" style="color:#000000"></td>`+
+      `<td class="c-qty"><input class="f eq-qty" style="text-align:center;color:#000000"></td></tr>`);
+  }
+  const collectEquipment = () => {
+    const items = [...document.querySelectorAll('.eq-item')];
+    const qtys  = [...document.querySelectorAll('.eq-qty')];
+    return items.map((it, i) => ({ item: it.value.trim(), qty: qtys[i].value.trim() }))
+                .filter(r => r.item || r.qty);
+  };
+
+  // ----- EN / IT language toggle -----
+  document.querySelectorAll('.langtoggle button').forEach(b => {
+    b.addEventListener('click', () => {
+      b.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      $('forSection').value = b.dataset.lang === 'IT' ? 'IT' : 'Production Engineer';
+    });
+  });
+
+  // ----- schedule radio (single choice) -----
+  document.querySelectorAll('.dot').forEach(d => {
+    d.addEventListener('click', () => {
+      if (!['engineer','admin'].includes(role)) return;   // only engineer/admin may tick
+      document.querySelectorAll(`.dot[data-radio="${d.dataset.radio}"]`).forEach(x => x.classList.remove('on'));
+      d.classList.add('on');
+    });
+  });
+  const scheduleFlag = () => document.querySelector('.dot.on[data-radio="sched"]')?.dataset.val || null;
+
+  // ----- picture upload -----
+  const MAX_IMG_MB = 5;
+  $('picInput').addEventListener('change', async e => {
+    const f = e.target.files[0]; if (!f) return;
+    if (!f.type.startsWith('image/')) { toast('กรุณาเลือกไฟล์รูปภาพ', false); e.target.value = ''; return; }
+    if (f.size > MAX_IMG_MB * 1024 * 1024) {
+      toast(`ไฟล์ใหญ่เกิน ${MAX_IMG_MB}MB (${(f.size/1024/1024).toFixed(1)}MB) — กรุณาเลือกรูปที่เล็กลง`, false);
+      e.target.value = ''; return;
+    }
+    $('picbox').innerHTML = `<span class="hint">กำลังอัปโหลด…</span>`;
+    const fd = new FormData(); fd.append('file', f);
+    try {
+      const res = await fetch('api/upload.php', { method:'POST', body:fd });
+      const d = await res.json();
+      if (res.ok) { picturePath = d.path; $('picbox').innerHTML = `<img src="${d.path}" alt="problem">`; }
+      else { toast(d.error || 'อัปโหลดไม่สำเร็จ', false); $('picbox').innerHTML = `<span class="hint">คลิกเพื่อแนบรูปภาพ</span>`; }
+    } catch { toast('เชื่อมต่อไม่ได้', false); }
+  });
+
+  // ----- lock helpers -----
+  const lock = sheet => {
+    sheet.querySelectorAll('input,textarea,select').forEach(el => { el.readOnly = true; el.disabled = el.tagName === 'SELECT'; });
+    sheet.querySelectorAll('.langtoggle button').forEach(b => b.disabled = true);
+    // note: schedule dots are NOT locked here — the click handler gates them by role
+  };
+
+  // ----- core save: writes the form to the DB, returns {id, rec_no,…} or null -----
+  async function doSave(){
+    let url, body;
+    if (!reqId) {                     // create (page 1; engineer/admin may include page 2)
+      url = 'api/request_create.php';
+      body = {
+        req_date: $('reqDate').value, for_section: $('forSection').value,
+        subject: $('subject').value, req_name: $('reqName').value,
+        position: $('position').value, section: $('section').value,
+        due_date: $('dueDate').value, detail: $('detail').value,
+        picture_path: picturePath,
+      };
+      if (['engineer','admin'].includes(role)) {   // engineer may fill page 2 in the same pass
+        Object.assign(body, {
+          operation_detail: $('operationDetail').value,
+          date_received: $('dateReceived').value, schedule_date: $('scheduleDate').value,
+          finish_date: $('finishDate').value, schedule_flag: scheduleFlag(),
+          schedule_cause: $('scheduleCause').value, result_status: $('resultStatus').value,
+          status: $('statusSel').value, equipment: collectEquipment(),
+        });
+      }
+    } else {                          // update (page 2 — engineer/admin)
+      url = 'api/request_update.php';
+      body = {
+        id: Number(reqId),
+        operation_detail: $('operationDetail').value,
+        date_received: $('dateReceived').value, schedule_date: $('scheduleDate').value,
+        finish_date: $('finishDate').value, schedule_flag: scheduleFlag(),
+        schedule_cause: $('scheduleCause').value, result_status: $('resultStatus').value,
+        status: $('statusSel').value, equipment: collectEquipment(),
+      };
+    }
+    try {
+      const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      const d = await res.json();
+      if (!res.ok){ toast(d.error || 'บันทึกไม่สำเร็จ', false); return null; }
+      dirty = false;
+      return d;
+    } catch { toast('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', false); return null; }
+  }
+
+  // ----- save + open the print dialog (browser "Save as PDF") in one pass -----
+  //  Both “บันทึกเป็น PDF” and “Print Out” run this: the document is always saved
+  //  to the DB first (so it carries a REC.No) and then printed — no manual save.
+  async function saveAndPrint(btn){
+    const old       = btn ? btn.textContent : '';
+    const needSave  = !reqId || dirty;                       // new request, or unsaved edits
+    const canUpdate = !reqId || ['engineer','admin'].includes(role);  // plain users can't update
+    let saved = null;
+    if (needSave && canUpdate){
+      if (btn){ btn.disabled = true; btn.textContent = 'กำลังบันทึก…'; }
+      saved = await doSave();
+      if (btn){ btn.disabled = false; btn.textContent = old; }
+      if (!saved) return;                                    // save failed → don't print
+      if (saved.rec_no) $('recNo').value = saved.rec_no;     // show the real REC.No in the printout
+      toast(saved.rec_no ? `บันทึกแล้ว — ${saved.rec_no}` : 'บันทึกแล้ว');
+    }
+    // a brand-new request: after the print dialog closes, reopen it by its saved id
+    if (saved && !reqId && saved.id){
+      window.addEventListener('afterprint',
+        () => { location.href = `form.html?id=${saved.id}`; }, { once:true });
+    }
+    setTimeout(() => window.print(), saved ? 350 : 0);       // let the toast / REC.No render first
+  }
+
+  $('saveBtn').addEventListener('click', () => saveAndPrint($('saveBtn')));
+
+  // ----- populate an existing request -----
+  function fill(r){
+    $('recNo').value = r.rec_no || '';
+    $('docTitle').textContent = `Request Job — ${r.rec_no}`;
+    $('reqDate').value = r.req_date || ''; $('forSection').value = r.for_section || 'IT';
+    $('subject').value = r.subject || ''; $('reqName').value = r.req_name || '';
+    $('position').value = r.position || ''; $('section').value = r.section || '';
+    $('dueDate').value = r.due_date || ''; $('detail').value = r.detail || '';
+    if (r.picture_path){ picturePath = r.picture_path; $('picbox').innerHTML = `<img src="${r.picture_path}" alt="problem">`; }
+    // page 2
+    $('operationDetail').value = r.operation_detail || '';
+    $('dateReceived').value = r.date_received || ''; $('scheduleDate').value = r.schedule_date || '';
+    $('finishDate').value = r.finish_date || ''; $('scheduleCause').value = r.schedule_cause || '';
+    $('resultStatus').value = r.result_status || '';
+    $('statusSel').value = r.status || 'pending';
+    if (r.schedule_flag) document.querySelector(`.dot[data-val="${r.schedule_flag}"]`)?.classList.add('on');
+    // equipment
+    const items = document.querySelectorAll('.eq-item'), qtys = document.querySelectorAll('.eq-qty');
+    (r.equipment || []).forEach((e, i) => { if (items[i]){ items[i].value = e.item || ''; qtys[i].value = e.qty || ''; } });
+  }
+
+  // ----- init -----
+  (async () => {
+    const me = await fetch('api/me.php');
+    if (!me.ok){ location.href = 'index.html'; return; }
+    role = (await me.json()).user.role;
+
+    // page 2 (engineer section) is fillable only by engineer/admin — tell others why
+    if (!['engineer','admin'].includes(role)) $('engNotice').hidden = false;
+
+    if (reqId){
+      const res = await fetch('api/request_get.php?id=' + encodeURIComponent(reqId));
+      if (!res.ok){ toast('ไม่พบรายการ', false); return; }
+      fill((await res.json()).request);
+      lock(PAGE1);                                  // page 1 locked once submitted
+      if (!['engineer','admin'].includes(role)){    // requester views only
+        lock(PAGE2); $('saveBtn').style.display = 'none';
+      }
+    } else {
+      $('reqDate').valueAsDate = new Date();
+      $('recNo').value = '(สร้างอัตโนมัติเมื่อบันทึก)';
+      // single A4: engineer section is filled later by an engineer, so it stays
+      // locked for ordinary requesters — but engineers/admins may fill it in one pass.
+      if (!['engineer','admin'].includes(role)) lock(PAGE2);
+    }
+  })();
+
+  // ----- unsaved-changes guard ("save before leaving") -----
+  const markDirty = () => { dirty = true; };
+  document.querySelectorAll('.sheet input, .sheet textarea, .sheet select')
+    .forEach(el => { el.addEventListener('input', markDirty); el.addEventListener('change', markDirty); });
+  document.querySelectorAll('.dot, .langtoggle button, #picInput').forEach(el => el.addEventListener('click', markDirty));
+
+  window.addEventListener('beforeunload', e => { if (dirty){ e.preventDefault(); e.returnValue = ''; } });
+  $('backBtn').addEventListener('click', () => {
+    if (dirty && !confirm('⚠️ คุณยังไม่ได้บันทึกข้อมูล\nต้องการออกจากหน้านี้โดยไม่บันทึกหรือไม่?')) return;
+    dirty = false; location.href = 'dashboard.html';
+  });
+
+  // ----- Print Out: auto-saves first (gets REC.No), then prints — no manual save -----
+  window.safePrint = () => saveAndPrint(null);
+
+  ['reqDate','dueDate','dateReceived','scheduleDate','finishDate'].forEach(DatePicker.attach);
+</script>
+</body>
+</html>

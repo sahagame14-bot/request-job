@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-store, must-revalidate" />
+<title>Dashboard — Request Job</title>
+<link rel="icon" type="image/png" href="logo.png" />
+<link rel="stylesheet" href="styles.css?v=57" />
+<style>
+  .hero{ background:linear-gradient(135deg,#1d4ed8,#0ea5e9); color:#fff; border-radius:18px; padding:24px 26px;
+    display:flex; align-items:center; gap:18px; margin-bottom:20px; position:relative; overflow:hidden;
+    box-shadow:0 12px 30px rgba(29,78,216,.25); }
+  .hero::after{ content:""; position:absolute; right:-40px; top:-50px; width:210px; height:210px; border-radius:50%; background:rgba(255,255,255,.10); }
+  .hero .hi{ font-size:23px; font-weight:800; }
+  .hero .sub{ opacity:.92; margin-top:4px; font-size:14px; }
+  .hero .btn{ margin-left:auto; background:#fff; color:var(--brand-dark); font-weight:700; z-index:1; }
+  .hero .btn:hover{ background:#eef4ff; }
+  .quick{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px; }
+  .qcard{ display:flex; align-items:center; gap:14px; background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px; text-decoration:none; color:var(--ink); box-shadow:0 4px 14px rgba(15,23,42,.05);
+    transition:transform .15s, box-shadow .2s; }
+  .qcard:hover{ transform:translateY(-3px); box-shadow:0 12px 26px rgba(15,23,42,.12); }
+  .qcard .qi{ width:46px; height:46px; border-radius:12px; flex:0 0 auto; display:flex; align-items:center; justify-content:center; }
+  .qcard .qi svg{ width:23px; height:23px; }
+  .qcard .qi.b{ background:#e0edff; color:#2563eb; } .qcard .qi.g{ background:#e3f7ec; color:#16a34a; } .qcard .qi.p{ background:#efe7fe; color:#7c3aed; }
+  .qcard .qt{ font-weight:700; font-size:15px; } .qcard .qd{ font-size:12px; color:var(--muted); margin-top:2px; }
+  .section-title{ margin:0 0 12px; font-size:17px; font-weight:700; color:var(--brand-dark); }
+  @media (max-width:820px){ .quick{ grid-template-columns:1fr; } .hero{ flex-direction:column; align-items:flex-start; } .hero .btn{ margin-left:0; } }
+</style>
+</head>
+<body class="app">
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <button class="sb-toggle" id="sbToggle" aria-label="ย่อ/ขยายเมนู" title="ย่อ/ขยายเมนู">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="sb-logo"><img src="logo.png" alt="KFT" /></div>
+      <div class="sb-brand">ENGINEERING</div>
+      <div class="sb-sub">Request Job System</div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-section">เมนู</div>
+      <a class="sb-item active" href="dashboard.html">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+        <span>แดชบอร์ด</span>
+      </a>
+
+      <div class="sb-section">งานแจ้ง</div>
+      <a class="sb-item" href="form.html">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span>
+        <span>แจ้งงานใหม่</span>
+      </a>
+      <a class="sb-item" href="myreports.html">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
+        <span>งานของฉัน</span>
+      </a>
+      <a class="sb-item eng-only" href="tasks.html" style="display:none">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+        <span>งานที่ต้องดำเนินการ</span>
+      </a>
+      <a class="sb-item eng-only" href="report.html" style="display:none">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></span>
+        <span>รายงาน</span>
+      </a>
+
+      <div class="sb-section admin-only" style="display:none">ผู้ดูแลระบบ</div>
+      <a class="sb-item admin-only" href="admin.html" style="display:none">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        <span>จัดการผู้ใช้</span>
+      </a>
+    </nav>
+
+    <div class="sb-foot">Engineering Dept, KFT<br>&copy; 2026</div>
+  </aside>
+
+  <!-- ===== Main column ===== -->
+  <div class="main">
+  <header class="topbar">
+    <button class="hamburger" id="hamburger" aria-label="เปิดเมนู">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <h2 class="page-title">แดชบอร์ด</h2>
+    <div class="spacer"></div>
+    <div id="notif-bell"></div>
+    <div class="who" id="who"></div>
+    <button class="btn ghost" id="logoutBtn">ออกจากระบบ</button>
+  </header>
+
+  <main class="wrap">
+    <div class="hero">
+      <div>
+        <div class="hi">สวัสดี, <span id="greetName">…</span> 👋</div>
+        <div class="sub" id="greetSub">ยินดีต้อนรับเข้าสู่ระบบแจ้งงาน Production Engineer &amp; IT</div>
+      </div>
+      <a class="btn" href="form.html">+ แจ้งงานใหม่</a>
+    </div>
+
+    <div class="quick">
+      <a class="qcard" href="form.html">
+        <div class="qi b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
+        <div><div class="qt">แจ้งงานใหม่</div><div class="qd">สร้างใบแจ้งงานใหม่</div></div>
+      </a>
+      <a class="qcard" href="myreports.html">
+        <div class="qi g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+        <div><div class="qt">งานของฉัน</div><div class="qd">งานที่ฉันแจ้งไว้</div></div>
+      </a>
+      <a class="qcard admin-only" href="admin.html" style="display:none">
+        <div class="qi p"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div><div class="qt">จัดการผู้ใช้</div><div class="qd">เพิ่ม / แก้ไขผู้ใช้</div></div>
+      </a>
+    </div>
+
+    <section class="cards">
+      <div class="card c-total"><div class="n" id="c_total">0</div><div class="l">ทั้งหมด</div></div>
+      <div class="card c-pending"><div class="n" id="c_pending">0</div><div class="l">Pending</div></div>
+      <div class="card c-receive"><div class="n" id="c_receive">0</div><div class="l">Receive</div></div>
+      <div class="card c-waiting"><div class="n" id="c_waiting">0</div><div class="l">Waiting</div></div>
+      <div class="card c-finish"><div class="n" id="c_finish">0</div><div class="l">Finish</div></div>
+      <div class="card c-cancel"><div class="n" id="c_cancel">0</div><div class="l">Cancel</div></div>
+    </section>
+
+    <h3 class="section-title">รายการล่าสุด</h3>
+    <div class="toolbar">
+      <input type="search" id="q" placeholder="ค้นหา REC.No / เรื่อง / ชื่อผู้แจ้ง…" />
+      <select id="statusFilter">
+        <option value="">ทุกสถานะ</option>
+        <option value="pending">Pending</option>
+        <option value="receive">Receive</option>
+        <option value="waiting">Waiting</option>
+        <option value="finish">Finish</option>
+        <option value="cancel">Cancel</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th style="width:100px;">Date</th>
+            <th style="width:128px;">REC.NO</th>
+            <th>Subject</th>
+            <th style="width:130px;">Name</th>
+            <th style="width:110px;">Position</th>
+            <th style="width:110px;">Section</th>
+            <th style="width:100px;">Due Date</th>
+            <th style="width:110px;">Status</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td class="empty" colspan="8">กำลังโหลด…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="pagination"></div>
+  </main>
+  </div><!-- /.main -->
+
+  <div class="sb-backdrop" id="sbBackdrop"></div>
+  <div id="toast" style="display:none;position:fixed;top:18px;left:50%;transform:translateX(-50%);
+       z-index:999;padding:11px 20px;border-radius:9px;color:#fff;font-weight:600;font-size:14px;
+       box-shadow:0 8px 24px rgba(0,0,0,.25);"></div>
+
+<script src="notifications.js?v=2"></script>
+<script>
+  const STATUS_TH = { pending:'Pending', receive:'Receive', waiting:'Waiting', finish:'Finish', cancel:'Cancel' };
+  const fmtDate = d => { if (!d) return '—'; const dt = new Date(d); return `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}/${dt.getFullYear()}`; };
+  const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  const toast = (msg, ok = true) => {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.background = ok ? '#16a34a' : '#dc2626'; t.style.display = 'block';
+    clearTimeout(t._t); t._t = setTimeout(() => t.style.display = 'none', 2600);
+  };
+
+  // guard + greet + role-based menu
+  fetch('api/me.php').then(async r => {
+    if (!r.ok) { location.href = 'index.html'; return; }
+    const { user } = await r.json();
+    document.getElementById('who').innerHTML =
+      `<b>${esc(user.name)}</b><br>${esc(user.department||'')} · ${user.role}`;
+    document.getElementById('greetName').textContent = (user.name || '').split(' ')[0] || user.username;
+    document.getElementById('greetSub').textContent =
+      new Date().toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    if (['engineer','admin'].includes(user.role))
+      document.querySelectorAll('.eng-only').forEach(el => el.style.display = '');
+    if (user.role === 'admin')
+      document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+    NotifBell.init({ mount: '#notif-bell' });
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch('api/logout.php'); location.href = 'index.html';
+  });
+
+  // ----- sidebar: collapse (desktop, persisted) + drawer (mobile) -----
+  const body = document.body;
+  if (localStorage.getItem('sb-collapsed') === '1') body.classList.add('sidebar-collapsed');
+  document.getElementById('sbToggle').addEventListener('click', () => {
+    body.classList.toggle('sidebar-collapsed');
+    localStorage.setItem('sb-collapsed', body.classList.contains('sidebar-collapsed') ? '1' : '0');
+  });
+  const closeDrawer = () => body.classList.remove('sidebar-open');
+  document.getElementById('hamburger').addEventListener('click', () => body.classList.toggle('sidebar-open'));
+  document.getElementById('sbBackdrop').addEventListener('click', closeDrawer);
+
+  // not-yet-built pages
+  document.querySelectorAll('[data-soon]').forEach(a =>
+    a.addEventListener('click', e => { e.preventDefault(); closeDrawer(); toast('หน้าจัดการผู้ใช้ — กำลังพัฒนา', false); }));
+
+  const rowsEl = document.getElementById('rows');
+  let timer = null;
+  let curPage = 1, curPerPage = 10;
+
+  async function load(resetPage = true) {
+    if (resetPage) curPage = 1;
+    const q = document.getElementById('q').value.trim();
+    const status = document.getElementById('statusFilter').value;
+    const url = `api/request_list.php?q=${encodeURIComponent(q)}&status=${encodeURIComponent(status)}`
+              + `&page=${curPage}&per_page=${curPerPage}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) { location.href = 'index.html'; return; }
+      const { rows, counts, total, pages } = await res.json();
+      document.getElementById('c_total').textContent = counts.total ?? 0;
+      document.getElementById('c_pending').textContent = counts.pending ?? 0;
+      document.getElementById('c_receive').textContent = counts.receive ?? 0;
+      document.getElementById('c_waiting').textContent = counts.waiting ?? 0;
+      document.getElementById('c_finish').textContent = counts.finish ?? 0;
+      document.getElementById('c_cancel').textContent = counts.cancel ?? 0;
+
+      renderPagination(total, pages);
+
+      if (!rows.length) {
+        rowsEl.innerHTML = '<tr><td class="empty" colspan="8">ยังไม่มีรายการแจ้งงาน</td></tr>';
+        return;
+      }
+      rowsEl.innerHTML = rows.map(r => `
+        <tr onclick="location.href='form.html?id=${r.id}'">
+          <td>${fmtDate(r.req_date)}</td>
+          <td class="rec">${esc(r.rec_no)}</td>
+          <td class="wrap">${esc(r.subject) || '<span style=color:#9aa0a6>(ไม่มีหัวข้อ)</span>'}</td>
+          <td>${esc(r.req_name)||'—'}</td>
+          <td>${esc(r.position)||'—'}</td>
+          <td>${esc(r.section)||'—'}</td>
+          <td>${fmtDate(r.due_date)}</td>
+          <td><span class="badge ${r.status}">${STATUS_TH[r.status]||r.status}</span></td>
+        </tr>`).join('');
+    } catch {
+      rowsEl.innerHTML = '<tr><td class="empty" colspan="8">เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</td></tr>';
+    }
+  }
+
+  function renderPagination(total, pages) {
+    const el = document.getElementById('pagination');
+    const opts = [10, 20, 50, 100].map(n =>
+      `<option value="${n}"${n === curPerPage ? ' selected' : ''}>${n} แถว</option>`).join('');
+    let btns = `<button class="pag-btn" ${curPage<=1?'disabled':''} onclick="goPage(${curPage-1})">‹</button>`;
+    if (pages > 1) {
+      const show = new Set([1, pages, curPage-1, curPage, curPage+1].filter(p => p>=1 && p<=pages));
+      let prev = 0;
+      [...show].sort((a,b)=>a-b).forEach(p => {
+        if (prev && p - prev > 1) btns += `<span class="pag-info">…</span>`;
+        btns += `<button class="pag-btn${p===curPage?' active':''}" onclick="goPage(${p})">${p}</button>`;
+        prev = p;
+      });
+    }
+    btns += `<button class="pag-btn" ${curPage>=pages?'disabled':''} onclick="goPage(${curPage+1})">›</button>`;
+    el.innerHTML = `<div class="pagination">
+      ${btns}
+      <span class="pag-info">${total} รายการ</span>
+      <select class="pag-perpage" onchange="changePerPage(this.value)">${opts}</select>
+    </div>`;
+  }
+  window.goPage = function(p){ curPage = p; load(false); };
+  window.changePerPage = function(v){ curPerPage = +v; load(true); };
+
+  document.getElementById('q').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => load(true), 300); });
+  document.getElementById('statusFilter').addEventListener('change', () => load(true));
+  load(true);
+</script>
+</body>
+</html>

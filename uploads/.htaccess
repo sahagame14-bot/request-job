@@ -1,0 +1,22 @@
+# uploads/ holds user-supplied files only — never executable code.
+# Disable directory listing and refuse to run any script here.
+Options -Indexes -ExecCGI
+
+# Strip handlers so .php/.phtml/etc. are served as plain downloads, not executed.
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .pht .phar .cgi .pl .py .asp .aspx .jsp .sh
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .pht .phar
+
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+  php_flag engine off
+</IfModule>
+
+# Belt-and-braces: block direct requests to any script-like file.
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|pht|phar|cgi|pl|py|asp|aspx|jsp|sh|exe)$">
+  Require all denied
+</FilesMatch>

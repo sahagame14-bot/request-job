@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-store, must-revalidate" />
+<title>รายงาน — Request Job</title>
+<link rel="icon" type="image/png" href="logo.png" />
+<link rel="stylesheet" href="styles.css?v=57" />
+<style>
+  /* ---- wide comparison report table ---- */
+  .rep-scroll{ overflow-x:auto; }
+  table.rep{ width:100%; min-width:1600px; border-collapse:separate; border-spacing:0; font-size:13px; }
+  table.rep th, table.rep td{ border-bottom:1px solid #eef1f6; border-right:1px solid #eef1f6; padding:9px 11px; text-align:left; vertical-align:top; }
+  table.rep th:first-child, table.rep td:first-child{ border-left:1px solid #eef1f6; }
+  table.rep tbody tr:last-child td{ border-bottom:none; }
+  table.rep thead th{ position:sticky; top:0; z-index:1; }
+  /* grouped header */
+  table.rep .grp{ text-align:center; font-size:12px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; padding:8px; }
+  table.rep .grp.req{ background:#e8f0ff; color:#1e40af; }
+  table.rep .grp.rep{ background:#e6f7ee; color:#15803d; }
+  table.rep thead .sub th{ background:#f8fafc; color:var(--muted); font-weight:600; font-size:11.5px;
+    text-transform:uppercase; letter-spacing:.3px; white-space:nowrap; }
+  table.rep thead .sub th.req{ background:#f1f6ff; }
+  table.rep thead .sub th.rep{ background:#f1fbf5; }
+  table.rep tbody tr.data-row{ cursor:pointer; transition:background .12s; }
+  table.rep tbody tr.data-row:hover{ background:#f4f8ff; }
+  table.rep tbody tr.data-row.row-open{ background:#edf4ff !important; }
+  table.rep tbody td.req{ background:#fbfdff; }
+  table.rep .rec{ font-weight:700; color:var(--brand); white-space:nowrap; }
+  table.rep .op{ min-width:240px; max-width:380px; white-space:pre-wrap; overflow-wrap:anywhere; }
+  /* long free-text columns wrap onto the next line instead of overflowing */
+  table.rep td.wrap{ max-width:240px; white-space:normal; overflow-wrap:anywhere; }
+  table.rep .nowrap{ white-space:nowrap; }
+  table.rep .empty{ text-align:center; color:var(--muted); padding:40px; cursor:default; }
+  table.rep .pdf{ text-align:center; }
+  table.rep .pdf a{ color:#16a34a; font-weight:800; font-size:15px; text-decoration:none; }
+  table.rep .pdf a:hover{ color:#15803d; }
+  table.rep .pdf .none{ color:#cbd5e1; }
+  table.rep .pdf a.print{ color:#94a3b8; font-size:14px; }
+  table.rep .pdf a.print:hover{ color:#475569; }
+  .legend{ display:flex; gap:18px; flex-wrap:wrap; margin:0 0 10px; font-size:12.5px; color:var(--muted); }
+  .legend b{ color:var(--ink); }
+  .legend .sw{ display:inline-block; width:13px; height:13px; border-radius:3px; vertical-align:-2px; margin-right:5px; }
+
+  /* ---- action buttons ---- */
+  .acts{ white-space:nowrap; text-align:center; vertical-align:middle; }
+  .act-btn{ display:inline-flex; align-items:center; gap:3px; padding:4px 9px; border-radius:999px; border:none; cursor:pointer; font-size:12px; font-weight:600; transition:all .15s; line-height:1.4; }
+  .act-btn.edit{ background:#eff6ff; color:#2563eb; }
+  .act-btn.edit:hover{ background:#2563eb; color:#fff; }
+  .act-btn.del{ background:#fff1f2; color:#e11d48; }
+  .act-btn.del:hover{ background:#e11d48; color:#fff; }
+
+  /* ===== Report modal ===== */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:flex-start; justify-content:center; padding:40px 16px;
+    background:rgba(15,23,42,.55); backdrop-filter:blur(3px); overflow-y:auto;
+    font-family:"Sarabun","Tahoma",Arial,sans-serif;
+  }
+  .modal-overlay.show{ display:flex; animation:ovIn .2s ease; }
+  @keyframes ovIn{ from{ opacity:0 } to{ opacity:1 } }
+  .modal{
+    width:640px; max-width:100%; background:#fff; border-radius:18px;
+    box-shadow:0 24px 60px rgba(0,0,0,.4); overflow:hidden;
+    animation:mdIn .26s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes mdIn{ from{ opacity:0; transform:translateY(22px) scale(.98) } to{ opacity:1; transform:none } }
+  .modal-head{
+    background:linear-gradient(135deg,#1d4ed8,#0ea5e9); color:#fff;
+    padding:16px 22px; display:flex; align-items:center; gap:12px;
+  }
+  .modal-head .mh-ico{ width:34px; height:34px; border-radius:10px; background:rgba(255,255,255,.18);
+    display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto; }
+  .modal-head h3{ margin:0; font-size:17px; font-weight:800; }
+  .modal-head .rec{ font-size:12.5px; opacity:.92; margin-top:2px; }
+  .modal-head .x{ margin-left:auto; background:rgba(255,255,255,.16); border:none; color:#fff;
+    width:34px; height:34px; border-radius:10px; font-size:20px; cursor:pointer; line-height:1;
+    transition:background .15s; }
+  .modal-head .x:hover{ background:rgba(255,255,255,.32); }
+  .modal-body{ padding:20px 22px; max-height:calc(100vh - 230px); overflow-y:auto; }
+  .modal-foot{ padding:14px 22px; border-top:1px solid var(--line); display:flex; gap:10px; justify-content:flex-end;
+    background:#f8fafc; }
+  .fgrid{ display:grid; grid-template-columns:1fr 1fr; gap:14px 16px; }
+  .field{ display:flex; flex-direction:column; gap:5px; }
+  .field.full{ grid-column:1 / -1; }
+  .field label{ font-size:12.5px; font-weight:700; color:#374151; }
+  .field label small{ font-weight:400; color:#9aa0a6; }
+  .field input, .field textarea, .field select{
+    font:inherit; font-size:14px; color:var(--ink); padding:9px 11px;
+    border:1px solid var(--line); border-radius:10px; background:#fff; outline:none; width:100%;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .field textarea{ resize:vertical; min-height:84px; }
+  .field input:focus, .field textarea:focus, .field select:focus{
+    border-color:#1d4ed8; box-shadow:0 0 0 3px rgba(29,78,216,.14);
+  }
+  .pdfzone{ display:flex; align-items:center; gap:12px; border:1.5px dashed var(--line);
+    border-radius:12px; padding:12px 14px; background:#fbfdff; transition:border-color .15s, background .15s; }
+  .pdfzone:hover{ border-color:#1d4ed8; background:#f3f8ff; }
+  .pdfzone .pz-ico{ width:38px; height:38px; border-radius:10px; background:#fee2e2; color:#dc2626;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex:0 0 auto; }
+  .pdfzone .pz-name{ font-size:13px; color:var(--ink); word-break:break-all; }
+  .pdfzone .pz-name .muted{ color:#9aa0a6; }
+  .pdfzone a{ color:#1d4ed8; font-weight:700; text-decoration:none; }
+  .pdfzone .pz-clear{ margin-left:auto; border:none; background:#fee2e2; color:#dc2626; border-radius:8px;
+    padding:5px 10px; cursor:pointer; font:inherit; font-size:12px; font-weight:700; }
+
+  /* ---- detail accordion row ---- */
+  tr.detail-row td{ padding:0 !important; border-top:none !important; }
+  .prev-card{ display:flex; border-top:3px solid #3b82f6; animation:slideDown .18s ease; }
+  @keyframes slideDown{ from{ opacity:0; transform:translateY(-4px); } to{ opacity:1; transform:none; } }
+  .prev-sec{ flex:1; padding:14px 20px; }
+  .prev-req{ background:#f7faff; border-right:1px solid #dde8ff; }
+  .prev-rep{ background:#f7fffe; border-right:1px solid #eef1f6; }
+  .prev-act{ background:#f8fafc; padding:14px 18px; display:flex; flex-direction:column; gap:8px; align-items:flex-start; justify-content:center; min-width:140px; }
+  .prev-head{ font-size:11px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; margin-bottom:10px; }
+  .prev-req .prev-head{ color:#1e40af; }
+  .prev-rep .prev-head{ color:#15803d; }
+  .prev-act .prev-head{ color:var(--muted); }
+  .prev-grid{ display:grid; grid-template-columns:110px 1fr; row-gap:6px; column-gap:10px; font-size:12.5px; align-items:start; }
+  .pk{ color:var(--muted); font-size:12px; padding-top:1px; }
+  .pv{ color:var(--ink); }
+  .pv-wrap{ white-space:pre-wrap; }
+  .prev-act .act-btn{ width:100%; justify-content:center; }
+  .prev-act .act-btn.del:hover{ background:#fff1f2; }
+</style>
+</head>
+<body class="app">
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <button class="sb-toggle" id="sbToggle" aria-label="ย่อ/ขยายเมนู" title="ย่อ/ขยายเมนู">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="sb-logo"><img src="logo.png" alt="KFT" /></div>
+      <div class="sb-brand">ENGINEERING</div>
+      <div class="sb-sub">Request Job System</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">เมนู</div>
+      <a class="sb-item" href="dashboard.html">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+        <span>แดชบอร์ด</span>
+      </a>
+      <div class="sb-section">งานแจ้ง</div>
+      <a class="sb-item" href="form.html">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span>
+        <span>แจ้งงานใหม่</span>
+      </a>
+      <a class="sb-item" href="myreports.html">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
+        <span>งานของฉัน</span>
+      </a>
+      <a class="sb-item eng-only" href="tasks.html" style="display:none">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+        <span>งานที่ต้องดำเนินการ</span>
+      </a>
+      <a class="sb-item active eng-only" href="report.html" style="display:none">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></span>
+        <span>รายงาน</span>
+      </a>
+      <div class="sb-section admin-only" style="display:none">ผู้ดูแลระบบ</div>
+      <a class="sb-item admin-only" href="admin.html" style="display:none">
+        <span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        <span>จัดการผู้ใช้</span>
+      </a>
+    </nav>
+    <div class="sb-foot">Engineering Dept, KFT<br>&copy; 2026</div>
+  </aside>
+
+  <!-- ===== Main ===== -->
+  <div class="main">
+  <header class="topbar">
+    <button class="hamburger" id="hamburger" aria-label="เปิดเมนู">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <h2 class="page-title">รายงาน</h2>
+    <div class="spacer"></div>
+    <div id="notif-bell"></div>
+    <div class="who" id="who"></div>
+    <button class="btn ghost" id="logoutBtn">ออกจากระบบ</button>
+  </header>
+
+  <main class="wrap">
+    <div class="page-head">
+      <h1>รายงานการดำเนินการ</h1>
+      <div class="spacer"></div>
+    </div>
+
+    <section class="cards">
+      <div class="card c-total"><div class="n" id="c_total">0</div><div class="l">ทั้งหมด</div></div>
+      <div class="card c-pending"><div class="n" id="c_pending">0</div><div class="l">Pending</div></div>
+      <div class="card c-receive"><div class="n" id="c_receive">0</div><div class="l">Receive</div></div>
+      <div class="card c-waiting"><div class="n" id="c_waiting">0</div><div class="l">Waiting</div></div>
+      <div class="card c-finish"><div class="n" id="c_finish">0</div><div class="l">Finish</div></div>
+      <div class="card c-cancel"><div class="n" id="c_cancel">0</div><div class="l">Cancel</div></div>
+    </section>
+
+    <div id="filterbar"></div>
+
+    <div class="legend">
+      <span><span class="sw" style="background:#e8f0ff"></span><b>รายละเอียดงาน</b> — ข้อมูลที่ผู้แจ้งกรอก</span>
+      <span><span class="sw" style="background:#e6f7ee"></span><b>รายงานการดำเนินการ</b> — ข้อมูลที่ Engineer/IT กรอก</span>
+      <span>คลิกแถวเพื่อดูรายละเอียด · แก้ไข · 🗑 ลบ (admin)</span>
+    </div>
+
+    <div class="table-wrap">
+      <div class="rep-scroll">
+      <table class="rep">
+        <thead>
+          <tr>
+            <th class="grp req" colspan="8">รายละเอียดงาน · REQUEST</th>
+            <th class="grp rep" colspan="7">รายงานการดำเนินการ · OPERATION REPORT</th>
+            <th class="grp" style="background:#f8fafc; width:140px;"></th>
+          </tr>
+          <tr class="sub">
+            <th class="req">Date</th>
+            <th class="req">REC.NO</th>
+            <th class="req">Subject</th>
+            <th class="req">Name</th>
+            <th class="req">Position</th>
+            <th class="req">Section</th>
+            <th class="req">Due Date</th>
+            <th class="req">Status</th>
+            <th class="rep">Receive Date</th>
+            <th class="rep">Operation Detail</th>
+            <th class="rep">Schedule Date</th>
+            <th class="rep">Finish Date</th>
+            <th class="rep">Remark</th>
+            <th class="rep">Section</th>
+            <th class="rep">PDF</th>
+            <th style="background:#f8fafc;"></th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td class="empty" colspan="16">กำลังโหลด…</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+    <div id="pagination"></div>
+  </main>
+  </div><!-- /.main -->
+
+  <div class="sb-backdrop" id="sbBackdrop"></div>
+
+  <!-- ===== Report modal ===== -->
+  <div class="modal-overlay" id="repModal">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div class="mh-ico">📝</div>
+        <div>
+          <h3>รายงานการดำเนินการ</h3>
+          <div class="rec" id="m_rec">—</div>
+        </div>
+        <button class="x" id="m_close" title="ปิด">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="fgrid">
+          <div class="field full">
+            <label>Operation Detail <small>รายละเอียดการดำเนินงาน</small></label>
+            <textarea id="m_operation" placeholder="อธิบายสิ่งที่ดำเนินการ…"></textarea>
+          </div>
+          <div class="field">
+            <label>Receive Date <small>วันที่รับแจ้ง</small></label>
+            <input type="date" id="m_received">
+          </div>
+          <div class="field">
+            <label>Section <small>ส่วนงานที่ดำเนินการ</small></label>
+            <select id="m_section">
+              <option value="IT">IT</option>
+              <option value="Production Engineer">Production Engineer</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Schedule Date <small>กำหนดการ</small></label>
+            <input type="date" id="m_schedule">
+          </div>
+          <div class="field">
+            <label>Finish Date <small>วันที่เสร็จ</small></label>
+            <input type="date" id="m_finish">
+          </div>
+          <div class="field">
+            <label>Remark <small>หมายเหตุ / สถานะ</small></label>
+            <input type="text" id="m_remark" placeholder="เช่น รอของ">
+          </div>
+          <div class="field">
+            <label>สถานะงาน <small>Status</small></label>
+            <select id="m_status">
+              <option value="pending">Pending</option>
+              <option value="receive">Receive</option>
+              <option value="waiting">Waiting</option>
+              <option value="finish">Finish</option>
+              <option value="cancel">Cancel</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label>PDF <small>แนบไฟล์รายงาน (PDF, ไม่เกิน 10MB)</small></label>
+            <div class="pdfzone" id="m_pdfzone">
+              <div class="pz-ico">PDF</div>
+              <div class="pz-name" id="m_pdfname"><span class="muted">ยังไม่มีไฟล์ — คลิกเพื่อแนบ</span></div>
+              <button type="button" class="pz-clear" id="m_pdfclear" style="display:none">ลบไฟล์</button>
+            </div>
+            <input type="file" id="m_pdfinput" accept="application/pdf" hidden>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn ghost" id="m_cancel">ยกเลิก</button>
+        <button class="btn primary" id="m_save">💾 บันทึกรายงาน</button>
+      </div>
+    </div>
+  </div>
+
+<script src="filters.js?v=2"></script>
+<script src="notifications.js?v=2"></script>
+<script src="datepicker.js?v=1"></script>
+<script>
+  const STATUS_TH = { pending:'Pending', receive:'Receive', waiting:'Waiting', finish:'Finish', cancel:'Cancel' };
+  const fmtDate = d => { if (!d) return '—'; const dt = new Date(d); return `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}/${dt.getFullYear()}`; };
+  const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  let userRole = '';
+  let openId = null;
+  const byId = {};
+  let curPage = 1, curPerPage = 10;
+
+  // guard: engineer/admin only
+  fetch('api/me.php').then(async r => {
+    if (!r.ok) { location.href = 'index.html'; return; }
+    const { user } = await r.json();
+    if (!['engineer','admin'].includes(user.role)) { location.href = 'dashboard.html'; return; }
+    userRole = user.role;
+    document.getElementById('who').innerHTML =
+      `<b>${esc(user.name)}</b><br>${esc(user.department||'')} · ${user.role}`;
+    document.querySelectorAll('.eng-only').forEach(el => el.style.display = '');
+    if (user.role === 'admin') document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+    NotifBell.init({ mount: '#notif-bell' });
+    FilterBar.init({ mount:'#filterbar', status:true, onChange:() => load(true) });
+    load();
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch('api/logout.php'); location.href = 'index.html';
+  });
+
+  const rowsEl = document.getElementById('rows');
+
+  function toggleDetail(id) {
+    const detRow = document.getElementById('detail-' + id);
+    const dataRow = document.getElementById('row-' + id);
+    if (!detRow) return;
+    if (openId === id) {
+      detRow.style.display = 'none';
+      dataRow.classList.remove('row-open');
+      openId = null;
+    } else {
+      if (openId) {
+        const prev = document.getElementById('detail-' + openId);
+        const prevRow = document.getElementById('row-' + openId);
+        if (prev) prev.style.display = 'none';
+        if (prevRow) prevRow.classList.remove('row-open');
+      }
+      detRow.style.display = '';
+      dataRow.classList.add('row-open');
+      openId = id;
+    }
+  }
+
+  async function del(id) {
+    if (!confirm('ลบรายการนี้ออกจากระบบ?\nไม่สามารถกู้คืนได้')) return;
+    try {
+      const res = await fetch('api/request_delete.php', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      const j = await res.json();
+      if (j.ok) {
+        if (openId === id) openId = null;
+        load();
+      } else {
+        alert('ลบไม่สำเร็จ: ' + (j.error || 'unknown'));
+      }
+    } catch {
+      alert('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้');
+    }
+  }
+
+  async function load(resetPage = true) {
+    if (resetPage) curPage = 1;
+    const f = FilterBar.state();
+    const url = `api/request_list.php?q=${encodeURIComponent(f.q)}&status=${encodeURIComponent(f.status)}`
+              + `&date_from=${f.date_from}&date_to=${f.date_to}&sort=${f.sort}`
+              + `&page=${curPage}&per_page=${curPerPage}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) { location.href = 'index.html'; return; }
+      const { rows, counts, total, pages } = await res.json();
+      document.getElementById('c_total').textContent = counts.total ?? 0;
+      document.getElementById('c_pending').textContent = counts.pending ?? 0;
+      document.getElementById('c_receive').textContent = counts.receive ?? 0;
+      document.getElementById('c_waiting').textContent = counts.waiting ?? 0;
+      document.getElementById('c_finish').textContent = counts.finish ?? 0;
+      document.getElementById('c_cancel').textContent = counts.cancel ?? 0;
+      openId = null;
+      renderPagination(total, pages);
+
+      if (!rows.length) {
+        rowsEl.innerHTML = '<tr><td class="empty" colspan="16">ไม่มีรายการ</td></tr>';
+        return;
+      }
+
+      rowsEl.innerHTML = rows.flatMap(r => {
+        const reported = (r.operation_detail && r.operation_detail.trim()) || r.finish_date || r.date_received;
+        const pdfCell = r.pdf_path
+          ? `<a href="${esc(r.pdf_path)}" target="_blank" title="เปิดไฟล์ PDF ที่แนบ" onclick="event.stopPropagation()">✓</a>`
+          : (reported
+              ? `<a href="form.html?id=${r.id}" class="print" title="ยังไม่แนบไฟล์ — เปิดเอกสารเพื่อพิมพ์" onclick="event.stopPropagation()">🖨</a>`
+              : `<span class="none" title="ยังไม่ได้รายงาน">—</span>`);
+        const remark = r.result_status || (r.schedule_flag === 'no_schedule' ? (r.schedule_cause || 'No Schedule') : '');
+
+        byId[r.id] = r;
+        // action buttons
+        const editBtn = `<button class="act-btn edit" onclick="event.stopPropagation();openReport(${r.id})" title="แก้ไขรายงาน">แก้ไข</button>`;
+        const delBtn  = userRole === 'admin'
+          ? `<button class="act-btn del" onclick="event.stopPropagation();del(${r.id})" title="ลบรายการนี้">🗑</button>`
+          : '';
+
+        // preview PDF link (larger)
+        const pdfPreview = r.pdf_path
+          ? `<a href="${esc(r.pdf_path)}" target="_blank" style="color:#16a34a;font-weight:700;text-decoration:none;" onclick="event.stopPropagation()">✓ เปิดไฟล์ PDF</a>`
+          : (reported ? `<a href="form.html?id=${r.id}" style="color:#94a3b8;text-decoration:none;" onclick="event.stopPropagation()">🖨 พิมพ์เอกสาร</a>` : '—');
+
+        // detail accordion content
+        const detail = `
+          <tr class="detail-row" id="detail-${r.id}" style="display:none">
+            <td colspan="16">
+              <div class="prev-card">
+                <div class="prev-sec prev-req">
+                  <div class="prev-head">📋 รายละเอียดงาน · REQUEST</div>
+                  <div class="prev-grid">
+                    <span class="pk">หัวข้องาน</span><span class="pv">${esc(r.subject)||'—'}</span>
+                    <span class="pk">วันที่แจ้ง</span><span class="pv">${fmtDate(r.req_date)}</span>
+                    <span class="pk">ผู้แจ้ง</span><span class="pv">${esc(r.req_name)||'—'}</span>
+                    <span class="pk">ตำแหน่ง</span><span class="pv">${esc(r.position)||'—'}</span>
+                    <span class="pk">แผนก</span><span class="pv">${esc(r.section)||'—'}</span>
+                    <span class="pk">กำหนดเสร็จ</span><span class="pv">${fmtDate(r.due_date)}</span>
+                    <span class="pk">สถานะ</span><span class="pv"><span class="badge ${r.status}">${STATUS_TH[r.status]||r.status}</span></span>
+                    <span class="pk">เลขที่</span><span class="pv" style="font-weight:700;color:var(--brand)">${esc(r.rec_no)||'—'}</span>
+                  </div>
+                </div>
+                <div class="prev-sec prev-rep">
+                  <div class="prev-head">📊 รายงานการดำเนินการ · OPERATION REPORT</div>
+                  <div class="prev-grid">
+                    <span class="pk">วันที่รับงาน</span><span class="pv">${fmtDate(r.date_received)}</span>
+                    <span class="pk">รายละเอียด</span><span class="pv pv-wrap">${esc(r.operation_detail)||'—'}</span>
+                    <span class="pk">วันนัด</span><span class="pv">${fmtDate(r.schedule_date)}</span>
+                    <span class="pk">วันเสร็จ</span><span class="pv">${fmtDate(r.finish_date)}</span>
+                    <span class="pk">หมายเหตุ</span><span class="pv">${esc(remark)||'—'}</span>
+                    <span class="pk">แผนก</span><span class="pv">${esc(r.for_section)||'—'}</span>
+                    <span class="pk">เอกสาร</span><span class="pv">${pdfPreview}</span>
+                  </div>
+                </div>
+                <div class="prev-act">
+                  <div class="prev-head">การดำเนินการ</div>
+                  <button class="act-btn edit" onclick="openReport(${r.id})" style="width:100%;justify-content:center;">แก้ไขรายงาน</button>
+                  ${userRole === 'admin' ? `<button class="act-btn del" onclick="del(${r.id})" style="width:100%;justify-content:center;">🗑 ลบรายการ</button>` : ''}
+                </div>
+              </div>
+            </td>
+          </tr>`;
+
+        return [
+          `<tr class="data-row" id="row-${r.id}" onclick="toggleDetail(${r.id})">
+            <td class="req nowrap">${fmtDate(r.req_date)}</td>
+            <td class="req rec">${esc(r.rec_no)}</td>
+            <td class="req wrap">${esc(r.subject) || '<span style=color:#9aa0a6>(ไม่มีหัวข้อ)</span>'}</td>
+            <td class="req">${esc(r.req_name)||'—'}</td>
+            <td class="req">${esc(r.position)||'—'}</td>
+            <td class="req">${esc(r.section)||'—'}</td>
+            <td class="req nowrap">${fmtDate(r.due_date)}</td>
+            <td class="req"><span class="badge ${r.status}">${STATUS_TH[r.status]||r.status}</span></td>
+            <td class="nowrap">${fmtDate(r.date_received)}</td>
+            <td class="op">${esc(r.operation_detail) || '<span style=color:#cbd5e1>—</span>'}</td>
+            <td class="nowrap">${fmtDate(r.schedule_date)}</td>
+            <td class="nowrap">${fmtDate(r.finish_date)}</td>
+            <td class="wrap">${esc(remark) || '—'}</td>
+            <td>${esc(r.for_section)||'—'}</td>
+            <td class="pdf">${pdfCell}</td>
+            <td class="acts">${editBtn} ${delBtn}</td>
+          </tr>`,
+          detail
+        ];
+      }).join('');
+
+    } catch {
+      rowsEl.innerHTML = '<tr><td class="empty" colspan="16">เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</td></tr>';
+    }
+  }
+
+
+  function renderPagination(total, pages) {
+    const el = document.getElementById('pagination');
+    const opts = [10, 20, 50, 100].map(n =>
+      `<option value="${n}"${n === curPerPage ? ' selected' : ''}>${n} แถว</option>`).join('');
+    let btns = `<button class="pag-btn" ${curPage<=1?'disabled':''} onclick="goPage(${curPage-1})">‹</button>`;
+    if (pages > 1) {
+      const show = new Set([1, pages, curPage-1, curPage, curPage+1].filter(p => p>=1 && p<=pages));
+      let prev = 0;
+      [...show].sort((a,b)=>a-b).forEach(p => {
+        if (prev && p - prev > 1) btns += `<span class="pag-info">…</span>`;
+        btns += `<button class="pag-btn${p===curPage?' active':''}" onclick="goPage(${p})">${p}</button>`;
+        prev = p;
+      });
+    }
+    btns += `<button class="pag-btn" ${curPage>=pages?'disabled':''} onclick="goPage(${curPage+1})">›</button>`;
+    el.innerHTML = `<div class="pagination">
+      ${btns}
+      <span class="pag-info">${total} รายการ</span>
+      <select class="pag-perpage" onchange="changePerPage(this.value)">${opts}</select>
+    </div>`;
+  }
+  window.goPage = function(p){ curPage = p; load(false); };
+  window.changePerPage = function(v){ curPerPage = +v; load(true); };
+
+  // ===================== Report modal =====================
+  const $m = id => document.getElementById(id);
+  const modal = $m('repModal');
+  let curId = null, curRow = null, pdfPath = null;
+
+  function setPdfUI(path){
+    const name = $m('m_pdfname'), clr = $m('m_pdfclear');
+    if (path){
+      const file = path.split('/').pop();
+      name.innerHTML = `<a href="${path}" target="_blank" title="เปิดไฟล์">📄 ${esc(file)}</a>`;
+      clr.style.display = '';
+    } else {
+      name.innerHTML = '<span class="muted">ยังไม่มีไฟล์ — คลิกเพื่อแนบ</span>';
+      clr.style.display = 'none';
+    }
+  }
+
+  window.openReport = function(id){
+    const r = byId[id]; if (!r) return;
+    curId = id; curRow = r; pdfPath = undefined;
+    $m('m_rec').textContent = `${r.rec_no} · ${r.subject || '(ไม่มีหัวข้อ)'}`;
+    $m('m_operation').value = r.operation_detail || '';
+    $m('m_received').value  = r.date_received || r.req_date || '';
+    $m('m_schedule').value  = r.schedule_date || '';
+    $m('m_finish').value    = r.finish_date || '';
+    $m('m_remark').value    = r.result_status || '';
+    $m('m_section').value   = (r.for_section === 'Production Engineer') ? 'Production Engineer' : 'IT';
+    $m('m_status').value    = r.status || 'pending';
+    setPdfUI(r.pdf_path || '');
+    $m('m_pdfinput').value = '';
+    const sb = $m('m_save'); sb.disabled = false; sb.textContent = '💾 บันทึกรายงาน';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  };
+
+  function closeModal(){ modal.classList.remove('show'); document.body.style.overflow = ''; curId = null; }
+  $m('m_close').addEventListener('click', closeModal);
+  $m('m_cancel').addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('show')) closeModal(); });
+
+  $m('m_pdfzone').addEventListener('click', e => { if (e.target.id !== 'm_pdfclear') $m('m_pdfinput').click(); });
+  $m('m_pdfclear').addEventListener('click', () => { pdfPath = ''; $m('m_pdfinput').value=''; setPdfUI(''); });
+  $m('m_pdfinput').addEventListener('change', async e => {
+    const f = e.target.files[0]; if (!f) return;
+    if (f.type !== 'application/pdf'){ alert('กรุณาเลือกไฟล์ PDF'); e.target.value=''; return; }
+    if (f.size > 10*1024*1024){ alert('ไฟล์ PDF ใหญ่เกิน 10MB'); e.target.value=''; return; }
+    $m('m_pdfname').innerHTML = '<span class="muted">กำลังอัปโหลด…</span>';
+    const fd = new FormData(); fd.append('file', f);
+    try{
+      const res = await fetch('api/upload.php', { method:'POST', body:fd });
+      const d = await res.json();
+      if (res.ok){ pdfPath = d.path; setPdfUI(d.path); }
+      else { alert(d.error || 'อัปโหลดไม่สำเร็จ'); setPdfUI(curRow?.pdf_path || ''); }
+    } catch { alert('เชื่อมต่อไม่ได้'); setPdfUI(curRow?.pdf_path || ''); }
+  });
+
+  $m('m_save').addEventListener('click', async () => {
+    if (!curId) return;
+    const btn = $m('m_save'); btn.disabled = true; const old = btn.textContent; btn.textContent = 'กำลังบันทึก…';
+    const payload = {
+      id: curId,
+      operation_detail: $m('m_operation').value,
+      date_received: $m('m_received').value,
+      schedule_date: $m('m_schedule').value,
+      finish_date:   $m('m_finish').value,
+      result_status: $m('m_remark').value,
+      for_section:   $m('m_section').value,
+      status:        $m('m_status').value,
+      schedule_flag: curRow?.schedule_flag || null,
+      schedule_cause: curRow?.schedule_cause || null,
+    };
+    if (pdfPath !== undefined) payload.pdf_path = pdfPath;
+    try{
+      const res = await fetch('api/request_update.php', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
+      });
+      const d = await res.json();
+      if (res.ok){ closeModal(); load(); }
+      else { alert(d.error || 'บันทึกไม่สำเร็จ'); btn.disabled=false; btn.textContent=old; }
+    } catch { alert('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้'); btn.disabled=false; btn.textContent=old; }
+    finally { if (modal.classList.contains('show')){ btn.disabled=false; btn.textContent=old; } }
+  });
+
+  ['m_received','m_schedule','m_finish'].forEach(DatePicker.attach);
+
+  // ----- sidebar collapse / drawer -----
+  const body = document.body;
+  if (localStorage.getItem('sb-collapsed') === '1') body.classList.add('sidebar-collapsed');
+  document.getElementById('sbToggle').addEventListener('click', () => {
+    body.classList.toggle('sidebar-collapsed');
+    localStorage.setItem('sb-collapsed', body.classList.contains('sidebar-collapsed') ? '1' : '0');
+  });
+  document.getElementById('hamburger').addEventListener('click', () => body.classList.toggle('sidebar-open'));
+  document.getElementById('sbBackdrop').addEventListener('click', () => body.classList.remove('sidebar-open'));
+</script>
+</body>
+</html>

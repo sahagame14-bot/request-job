@@ -1,0 +1,17 @@
+# user-uploaded files (runtime data) — keep the folder + its .htaccess only
+uploads/*
+!uploads/.htaccess
+
+# database dumps for deploy (contain account data / password hashes)
+request_job.sql
+deploy_request_job.sql
+backup_demo_*.sql
+
+# OS / editor junk
+Thumbs.db
+desktop.ini
+.DS_Store
+*.log
+
+# Claude Code local settings
+.claude/

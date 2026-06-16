@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เข้าสู่ระบบ — Request Job (Production Engineer &amp; IT)</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="stylesheet" href="styles.css?v=52" />
+</head>
+<body class="login-page">
+
+  <div class="auth-mobile-brand"><img src="logo.png" alt="KFT — Kasiyama Finetech" /></div>
+
+  <div class="auth-container" id="authContainer">
+
+    <!-- SIGN UP -->
+    <div class="auth-form-panel auth-signup">
+      <form id="signupForm" autocomplete="off">
+        <h2>สร้างบัญชีใหม่</h2>
+        <p class="auth-sub">กรอกข้อมูลเพื่อสมัครใช้งาน</p>
+        <div class="auth-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" id="su_name" placeholder="ชื่อ-นามสกุล" />
+        </div>
+        <div class="auth-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
+          <input type="text" id="su_username" placeholder="Username (a-z, 0-9, _)" />
+        </div>
+        <div class="auth-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="su_password" placeholder="รหัสผ่าน (อย่างน้อย 8 ตัว)" />
+          <button type="button" class="pw-toggle" aria-label="แสดง/ซ่อนรหัสผ่าน">
+            <svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+        <div class="auth-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="su_confirm" placeholder="ยืนยันรหัสผ่าน" />
+          <button type="button" class="pw-toggle" aria-label="แสดง/ซ่อนรหัสผ่าน">
+            <svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+        <div class="auth-field">
+
+          
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <input type="text" id="su_department" placeholder="แผนก (เช่น Engineering)" />
+        </div>
+        <button type="submit" class="auth-btn">สมัครสมาชิก</button>
+        <div class="error" id="signupError"></div>
+        <a class="auth-mobile-toggle" id="mToSignIn">มีบัญชีแล้ว? เข้าสู่ระบบ</a>
+      </form>
+    </div>
+
+    <!-- SIGN IN -->
+    <div class="auth-form-panel auth-signin">
+      <form id="loginForm" autocomplete="off">
+        <h2>เข้าสู่ระบบ</h2>
+        <p class="auth-sub">ระบบแจ้งงาน Production Engineer &amp; IT</p>
+        <div class="auth-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
+          <input type="text" id="username" placeholder="Username" />
+        </div>
+        <div class="auth-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="password" placeholder="รหัสผ่าน" />
+          <button type="button" class="pw-toggle" aria-label="แสดง/ซ่อนรหัสผ่าน">
+            <svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+        <button type="submit" class="auth-btn">เข้าสู่ระบบ</button>
+        <div class="error" id="errorMsg"></div>
+        <a class="auth-mobile-toggle" id="mToSignUp">ยังไม่มีบัญชี? สมัครสมาชิก</a>
+      </form>
+    </div>
+
+    <!-- SLIDING OVERLAY -->
+    <div class="auth-overlay-wrap">
+      <div class="auth-overlay">
+        <div class="auth-overlay-panel auth-overlay-left">
+          <div class="overlay-logo"><img src="logo.png" alt="KFT" /></div>
+          <h1>ยินดีต้อนรับกลับมา!</h1>
+          <p>มีบัญชีอยู่แล้วใช่ไหม เข้าสู่ระบบเพื่อใช้งานต่อได้เลย</p>
+          <button class="auth-ghost-btn" id="toSignIn">เข้าสู่ระบบ</button>
+        </div>
+        <div class="auth-overlay-panel auth-overlay-right">
+          <div class="overlay-logo"><img src="logo.png" alt="KFT" /></div>
+          <h1>สวัสดี!</h1>
+          <p>ยังไม่มีบัญชี? สมัครสมาชิกเพื่อใช้ระบบแจ้งงาน Production Engineer &amp; IT</p>
+          <button class="auth-ghost-btn" id="toSignUp">สมัครสมาชิก</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="login-footer">Engineering Department, KFT &copy; 2026</footer>
+
+  <script>
+    // If already logged in, go to dashboard
+    fetch('api/me.php').then(r => { if (r.ok) location.href = 'dashboard.html'; });
+
+    const container = document.getElementById('authContainer');
+    const goSignUp = () => container.classList.add('right-active');
+    const goSignIn = () => container.classList.remove('right-active');
+    document.getElementById('toSignUp').addEventListener('click', goSignUp);
+    document.getElementById('toSignIn').addEventListener('click', goSignIn);
+    document.getElementById('mToSignUp').addEventListener('click', goSignUp);
+    document.getElementById('mToSignIn').addEventListener('click', goSignIn);
+
+    // --- Sign in ---
+    const loginForm = document.getElementById('loginForm');
+    const err = document.getElementById('errorMsg');
+    const loginBtn = loginForm.querySelector('button[type=submit]');
+    let _cdTimer = null;
+
+    function startCountdown(seconds) {
+      if (_cdTimer) clearInterval(_cdTimer);
+      loginBtn.disabled = true;
+      let rem = seconds;
+      const tick = () => {
+        const m = Math.floor(rem / 60);
+        const s = String(rem % 60).padStart(2, '0');
+        loginBtn.textContent = `รอ ${m}:${s} นาที`;
+        err.textContent = 'พยายามเข้าสู่ระบบหลายครั้งเกินไป กรุณารอให้ครบเวลา';
+        err.classList.add('show');
+      };
+      tick();
+      _cdTimer = setInterval(() => {
+        rem--;
+        if (rem <= 0) {
+          clearInterval(_cdTimer); _cdTimer = null;
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'เข้าสู่ระบบ';
+          err.classList.remove('show');
+        } else { tick(); }
+      }, 1000);
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (loginBtn.disabled) return;
+      err.classList.remove('show');
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      try {
+        const res = await fetch('api/login.php', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        if (res.ok) { location.href = 'dashboard.html'; }
+        else {
+          const d = await res.json();
+          if (res.status === 429 && d.retry_after) { startCountdownf(d.retry_after); }
+          else {
+            const suffix = (d.attempts && d.max) ? ` (${d.attempts}/${d.max} ครั้ง)` : '';
+            err.textContent = (d.error || 'Login failed') + suffix;
+            err.classList.add('show');
+          }
+        }
+      } catch { err.textContent = 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้'; err.classList.add('show'); }
+    });
+
+    // --- Sign up---
+    const signupForm = document.getElementById('signupForm');
+    const suErr = document.getElementById('signupError');
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      suErr.classList.remove('show');
+      const name       = document.getElementById('su_name').value.trim();
+      const username   = document.getElementById('su_username').value.trim();
+      const password   = document.getElementById('su_password').value;
+      const confirm    = document.getElementById('su_confirm').value;
+      const department = document.getElementById('su_department').value.trim();
+      if (password !== confirm) {
+        suErr.textContent = 'รหัสผ่านไม่ตรงกัน'; suErr.classList.add('show'); return;
+      }
+      try {
+        const res = await fetch('api/register.php', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, username, password, department }),
+        });
+        if (res.ok) { location.href = 'dashboard.html'; }
+        else { const d = await res.json(); suErr.textContent = d.error || 'Sign up failed'; suErr.classList.add('show'); }
+      } catch { suErr.textContent = 'Cannot reach server'; suErr.classList.add('show'); }
+    });
+
+    // clear errors on typing
+    document.querySelectorAll('#loginForm input').forEach(i => i.addEventListener('input', () => err.classList.remove('show')));
+    document.querySelectorAll('#signupForm input').forEach(i => i.addEventListener('input', () => suErr.classList.remove('show')));
+
+    // password visibility toggle
+    document.querySelectorAll('.pw-toggle').forEach(btn => {
+      btn.querySelector('.eye-hide').style.display = 'none';
+      btn.addEventListener('click', () => {
+        const input = btn.previousElementSibling;
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.querySelector('.eye-show').style.display = show ? 'none' : '';
+        btn.querySelector('.eye-hide').style.display = show ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>
