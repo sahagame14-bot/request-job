@@ -280,10 +280,12 @@
   const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
   // guard: engineer/admin only
+  let myRole = 'engineer';
   fetch('api/me.php').then(async r => {
     if (!r.ok) { location.href = 'index.html'; return; }
     const { user } = await r.json();
     if (!['engineer','admin'].includes(user.role)) { location.href = 'dashboard.html'; return; }
+    myRole = user.role;
     document.getElementById('who').innerHTML =
       `<b>${esc(user.name)}</b><br>${esc(user.department||'')} · ${user.role}`;
     document.querySelectorAll('.eng-only').forEach(el => el.style.display = '');
@@ -333,8 +335,15 @@
         return;
       }
       rows.forEach(r => byId[r.id] = r);
-      rowsEl.innerHTML = rows.map(r => `
-        <tr onclick="openReport(${r.id})">
+      rowsEl.innerHTML = rows.map(r => {
+        // an engineer may only view IT-section jobs in the list — not open them
+        const locked   = (myRole === 'engineer' && r.for_section === 'IT');
+        const hasReport = (r.operation_detail && r.operation_detail.trim()) || r.finish_date;
+        const action = locked
+          ? `<span title="ใบ section IT — เปิด/แก้ไม่ได้" style="display:inline-flex;align-items:center;gap:4px;color:#94a3b8;font-size:12px;font-weight:600;white-space:nowrap;">🔒 IT</span>`
+          : `<button class="btn-rep${hasReport?' done':''}" onclick="event.stopPropagation();openReport(${r.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>${hasReport?'ดูรายงาน':'รายงาน'}</button>`;
+        return `
+        <tr ${locked ? 'style="opacity:.62;cursor:not-allowed"' : `onclick="openReport(${r.id})"`}>
           <td>${fmtDate(r.req_date)}</td>
           <td class="rec">${esc(r.rec_no)}</td>
           <td class="wrap">${esc(r.subject) || '<span style=color:#9aa0a6>(ไม่มีหัวข้อ)</span>'}</td>
@@ -344,8 +353,9 @@
           <td>${fmtDate(r.due_date)}</td>
           <td><span class="badge ${r.status}">${STATUS_TH[r.status]||r.status}</span></td>
           <td>${r.pdf_path ? `<a href="${esc(r.pdf_path)}" target="_blank" onclick="event.stopPropagation()" style="color:#16a34a;font-weight:700;text-decoration:none;font-size:13px;white-space:nowrap;">ดู</a>` : '<span style="color:#cbd5e1">—</span>'}</td>
-          <td><button class="btn-rep${((r.operation_detail&&r.operation_detail.trim())||r.finish_date)?' done':''}" onclick="event.stopPropagation();openReport(${r.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>${((r.operation_detail&&r.operation_detail.trim())||r.finish_date)?'ดูรายงาน':'รายงาน'}</button></td>
-        </tr>`).join('');
+          <td>${action}</td>
+        </tr>`;
+      }).join('');
     } catch {
       rowsEl.innerHTML = '<tr><td class="empty" colspan="10">เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</td></tr>';
     }
@@ -419,6 +429,10 @@
 
   window.openReport = async function(id){
     const r = byId[id]; if (!r) return;
+    if (myRole === 'engineer' && r.for_section === 'IT'){     // IT-section jobs are view-only-in-list for engineers
+      alert('ใบนี้เป็นงาน section IT — ช่างเปิด/แก้ไขไม่ได้');
+      return;
+    }
     curId = id; curRow = r; pdfPath = undefined;
     $m('m_rec').textContent = `${r.rec_no} · ${r.subject || '(ไม่มีหัวข้อ)'}`;
     $m('m_operation').value = r.operation_detail || '';

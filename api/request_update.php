@@ -11,6 +11,15 @@ $d  = body();
 $id = (int)($d['id'] ?? 0);
 if (!$id) json_out(['error' => 'missing id'], 422);
 
+// engineers (ช่าง) may only view IT-section jobs — those belong to IT staff/admin
+if ($user['role'] === 'engineer') {
+    $own = db()->prepare('SELECT for_section FROM requests WHERE id = ?');
+    $own->execute([$id]);
+    $cur = $own->fetch(PDO::FETCH_ASSOC);
+    if (!$cur) json_out(['error' => 'not found'], 404);
+    if ($cur['for_section'] === 'IT') json_out(['error' => 'ใบ section IT — ช่างแก้ไขไม่ได้'], 403);
+}
+
 $flag = in_array(($d['schedule_flag'] ?? ''), ['on_schedule','no_schedule'], true)
         ? $d['schedule_flag'] : null;
 $status = in_array(($d['status'] ?? ''), ['pending','receive','waiting','finish','cancel'], true)

@@ -805,7 +805,11 @@
       const isOwner = String(req.created_by) === String(myId);
       // the owner may still edit their own REQUEST (page 1) while it is Pending
       ownerEdit = (!isEng && isOwner && req.status === 'pending');
-      if (isEng){
+      if (isEng && role !== 'admin' && req.for_section === 'IT'){
+        // an engineer (ช่าง) may only view IT-section jobs — full read-only
+        lock(PAGE1); lock(PAGE2);
+        $('saveBtn').style.display = 'none'; $('saveOnlyBtn').style.display = 'none';
+      } else if (isEng){
         lock(PAGE1);                 // engineers fill page 2, not the request half
         if (role === 'admin') $('recNo').removeAttribute('readonly');   // only admin may edit REC.No
       } else if (ownerEdit){
