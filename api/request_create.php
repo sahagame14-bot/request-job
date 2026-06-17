@@ -27,6 +27,17 @@ try {
                      ->fetchColumn();
     $recNo = sprintf('RJE-%d%04d', $year, $seq);
 
+    // only an admin may override the auto REC.No; everyone else gets the sequential one.
+    // duplicates are allowed (not blocked) but flagged back as a warning.
+    $warning = null;
+    $clientRec = ($user['role'] === 'admin') ? trim((string)($d['rec_no'] ?? '')) : '';
+    if ($clientRec !== '') {
+        $recNo = $clientRec;
+        $dup = $pdo->prepare('SELECT 1 FROM requests WHERE rec_no = ? LIMIT 1');
+        $dup->execute([$recNo]);
+        if ($dup->fetch()) $warning = 'เตือน: REC.No ' . $recNo . ' ซ้ำกับใบอื่น (บันทึกแล้ว)';
+    }
+
     // ----- page-2 (engineer) fields — only honoured for engineer/admin creators,
     //       so an engineer can fill the whole single-A4 form in one pass -----
     $canEng = in_array($user['role'], ['engineer', 'admin'], true);
@@ -96,7 +107,7 @@ try {
         }
     } catch (Throwable $e) { /* notifications are non-critical */ }
 
-    json_out(['ok' => true, 'id' => $reqId, 'rec_no' => $recNo]);
+    json_out(['ok' => true, 'id' => $reqId, 'rec_no' => $recNo, 'warning' => $warning]);
 } catch (Throwable $e) {
     $pdo->rollBack();
     json_out(['error' => 'บันทึกไม่สำเร็จ: ' . $e->getMessage()], 500);

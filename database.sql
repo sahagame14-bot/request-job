@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- ---------- requests (one job ticket) ----------
 CREATE TABLE IF NOT EXISTS requests (
   id             INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  rec_no         VARCHAR(20)  NOT NULL UNIQUE,         -- RJE-20260041
+  rec_no         VARCHAR(20)  NOT NULL,                -- RJE-20260041 (not unique: editable, duplicates warned not blocked)
   -- ----- page 1 : requester -----
   req_date       DATE         DEFAULT NULL,
   for_section    VARCHAR(60)  DEFAULT 'IT',            -- IT / Production Engineer
@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS requests (
   created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
+  KEY rec_no (rec_no),
   KEY idx_status (status),
   KEY idx_created_by (created_by),
   CONSTRAINT fk_req_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL

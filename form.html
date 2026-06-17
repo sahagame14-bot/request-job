@@ -140,9 +140,10 @@
   #operationDetail{
     line-height:28px;
     padding:6px 8px 0;
-    background-image:repeating-linear-gradient(to bottom,
-        transparent 0, transparent 27px, var(--line) 27px, var(--line) 28px);
-    background-attachment:local;     /* lines scroll together with the text */
+    /* lined-paper: one 28px tile (rule at the bottom) repeated to fill the whole box */
+    background-image:linear-gradient(to bottom, transparent 0, transparent 27px, var(--line) 27px, var(--line) 28px);
+    background-size:100% 28px;
+    background-repeat:repeat;
     background-position:0 6px;       /* align first rule with the first text line */
   }
 
@@ -262,7 +263,7 @@
 
   /* CHECK/ENG. + APPROVE/ASST·MGR — two compact signature blocks with small
      boxes, pushed to top & bottom to fill the column like the Excel form. */
-  .signcol{ display:flex; flex-direction:column; justify-content:space-between;
+  .signcol{ display:flex; flex-direction:column; justify-content:flex-start; gap:26px;
             height:100%; min-height:0; background:#fff; }
   /* each signature group is its own framed box (Excel-style); the white
      signing area is divided from the grey labels by a line, top & bottom. */
@@ -288,10 +289,10 @@
 
   /* ---------- Print (clean official document, fit ONE A4) ---------- */
   @media print{
-    @page{ size:A4 portrait; margin:6mm; }
-    html,body{ width:210mm; }
+    @page{ size:A4 portrait; margin:7mm; }
+    html,body{ width:auto; }            /* fit the printable area (not full 210mm) so borders aren't clipped */
     body{
-      background:#fff; padding:0; font-size:9px; line-height:1.2;
+      background:#fff; padding:0; font-size:12.5px; line-height:1.18;
       font-family:"Sarabun","Tahoma",Arial,sans-serif;
       -webkit-print-color-adjust:exact; print-color-adjust:exact;
     }
@@ -310,13 +311,20 @@
 
     /* tighter sizing so all 3 sections fit one A4 */
     table.form td{ padding:1px 4px; }
-    .sheet-title{ background:#fff; font-size:11px; padding:4px 4px; }
-    .lbl small{ font-size:7.5px; }
-    input.f, textarea.f, select.f{ padding:0 2px; }
-    textarea.f{ min-height:13px; }
-    #detail{ height:124px; }             /* section 1 expander */
-    .picbox{ height:224px; }             /* section 2 — picture */
-    #operationDetail{ height:176px; }    /* section 3 — engineer (bigger) */
+    .sheet-title{ background:#fff; font-size:15px; padding:3px 4px; }
+    .lbl small{ font-size:9.5px; }
+    input.f, textarea.f, select.f{ padding:1px 3px; }
+    textarea.f{ min-height:15px; }
+    /* make the filled values big & centred in each cell; centre all dates */
+    table.form td.fill, table.form td.lbl{ vertical-align:middle; }
+    input.f, select.f{ font-size:14.5px; }
+    input[type="date"].f{ text-align:center; width:100% !important; }
+    /* drop the native dropdown arrow from selects when printing */
+    select.f{ -webkit-appearance:none; -moz-appearance:none; appearance:none; background-image:none; padding-right:3px; }
+    #detail{ height:92px; }              /* section 1 expander */
+    .picbox{ height:160px; }             /* section 2 — picture */
+    .picbox .hint{ display:none !important; }   /* hide the "click to insert" placeholder when printing */
+    #operationDetail{ height:158px; }    /* section 3 — engineer */
     .approve .sigspace{ height:54px; }
     .eng-merged{ min-height:0; }          /* merged schedule+signature block */
     .em-sign{ flex-basis:104px; width:104px; }
@@ -342,7 +350,8 @@
   <div class="toolbar">
     <span class="title" id="docTitle">Request Job — Production Engineer &amp; IT</span>
     <button class="btn" id="backBtn">← กลับ</button>
-    <button class="btn" id="saveBtn">💾 บันทึกเป็น PDF</button>
+    <button class="btn" id="saveOnlyBtn">💾 บันทึก</button>
+    <button class="btn" id="saveBtn">📄 บันทึกเป็น PDF</button>
     <button class="btn primary" onclick="safePrint()">🖨 Print Out</button>
   </div>
   <div id="toast" style="display:none;position:fixed;top:18px;left:50%;transform:translateX(-50%);
@@ -373,7 +382,7 @@
         <td class="fill" colspan="2" style="white-space:nowrap;">
           <input class="f" type="date" id="reqDate" lang="en-GB" style="width:128px;display:inline-block;vertical-align:middle;">
           <div class="langtoggle" style="display:inline-flex;vertical-align:middle;margin-left:8px;">
-            <button type="button" class="on" data-lang="EN">EN</button>
+            <button type="button" class="on" data-lang="PE">PE</button>
             <button type="button" data-lang="IT">IT</button>
           </div>
         </td>
@@ -447,14 +456,14 @@
 
     <table class="form">
       <colgroup>
-        <col style="width:46%"><col style="width:32%"><col style="width:22%">
+        <col style="width:60%"><col style="width:18%"><col style="width:22%">
       </colgroup>
 
       <!-- OPERATION DETAIL (spans 2 cols) + APPROVE (right) -->
       <tr>
         <td colspan="2">
           <div class="lbl" style="margin-bottom:3px;">OPERATION DETAIL<small>รายละเอียดการดำเนินงาน</small></div>
-          <div class="fill" style="border:1px solid var(--line);">
+          <div class="fill">
             <textarea class="f eng" id="operationDetail" rows="8" style="color:#000000;min-height:150px"></textarea>
           </div>
         </td>
@@ -499,7 +508,7 @@
                   <br><small>ไม่ตามกำหนดเวลา</small></span>
               </div>
 
-              <p style="margin:10px 0 2px;"><strong>Status :</strong>
+              <p style="margin:30px 0 2px;"><strong>Status :</strong>
                 <input class="f eng" id="resultStatus" style="width:150px;border-bottom:1px dotted var(--line-soft);color:#000000"></p>
               <!-- workflow status is managed from the job list; kept hidden so a
                    save round-trips the current status instead of resetting it -->
@@ -563,7 +572,7 @@
   const PAGE2 = document.getElementById('part2');   // ENGINEER section (engineer/IT)
   const params   = new URLSearchParams(location.search);
   const reqId    = params.get('id');           // null => new request
-  let role = 'user', picturePath = '', dirty = false;
+  let role = 'user', myId = null, picturePath = '', dirty = false, ownerEdit = false;
 
   function toast(msg, ok = true){
     const t = $('toast');
@@ -637,6 +646,7 @@
     if (!reqId) {                     // create (page 1; engineer/admin may include page 2)
       url = 'api/request_create.php';
       body = {
+        rec_no: $('recNo').value,
         req_date: $('reqDate').value, for_section: $('forSection').value,
         subject: $('subject').value, req_name: $('reqName').value,
         position: $('position').value, section: $('section').value,
@@ -652,10 +662,21 @@
           status: $('statusSel').value, equipment: collectEquipment(),
         });
       }
+    } else if (ownerEdit) {           // owner editing their own Pending request (page 1)
+      url = 'api/request_edit.php';
+      body = {
+        id: Number(reqId),
+        req_date: $('reqDate').value, for_section: $('forSection').value,
+        subject: $('subject').value, req_name: $('reqName').value,
+        position: $('position').value, section: $('section').value,
+        due_date: $('dueDate').value, detail: $('detail').value,
+        picture_path: picturePath,
+      };
     } else {                          // update (page 2 — engineer/admin)
       url = 'api/request_update.php';
       body = {
         id: Number(reqId),
+        rec_no: $('recNo').value,        // honoured for admin only (server-gated)
         operation_detail: $('operationDetail').value,
         date_received: $('dateReceived').value, schedule_date: $('scheduleDate').value,
         finish_date: $('finishDate').value, schedule_flag: scheduleFlag(),
@@ -678,7 +699,7 @@
   async function saveAndPrint(btn){
     const old       = btn ? btn.textContent : '';
     const needSave  = !reqId || dirty;                       // new request, or unsaved edits
-    const canUpdate = !reqId || ['engineer','admin'].includes(role);  // plain users can't update
+    const canUpdate = !reqId || ['engineer','admin'].includes(role) || ownerEdit;  // owner may edit own pending request
     let saved = null;
     if (needSave && canUpdate){
       if (btn){ btn.disabled = true; btn.textContent = 'กำลังบันทึก…'; }
@@ -686,7 +707,8 @@
       if (btn){ btn.disabled = false; btn.textContent = old; }
       if (!saved) return;                                    // save failed → don't print
       if (saved.rec_no) $('recNo').value = saved.rec_no;     // show the real REC.No in the printout
-      toast(saved.rec_no ? `บันทึกแล้ว — ${saved.rec_no}` : 'บันทึกแล้ว');
+      if (saved.warning) toast(saved.warning, false);        // e.g. duplicate REC.No (saved anyway)
+      else toast(saved.rec_no ? `บันทึกแล้ว — ${saved.rec_no}` : 'บันทึกแล้ว');
     }
     // a brand-new request: after the print dialog closes, reopen it by its saved id
     if (saved && !reqId && saved.id){
@@ -697,6 +719,20 @@
   }
 
   $('saveBtn').addEventListener('click', () => saveAndPrint($('saveBtn')));
+
+  // ----- plain save (no printing) -----
+  async function saveOnly(btn){
+    const old = btn.textContent; btn.disabled = true; btn.textContent = 'กำลังบันทึก…';
+    const saved = await doSave();
+    btn.disabled = false; btn.textContent = old;
+    if (!saved) return;
+    if (saved.rec_no) $('recNo').value = saved.rec_no;
+    if (saved.warning) toast(saved.warning, false);          // e.g. duplicate REC.No (saved anyway)
+    else toast(saved.rec_no ? `บันทึกแล้ว — ${saved.rec_no}` : 'บันทึกแล้ว');
+    // a brand-new request: reopen it by its saved id (so it carries the REC.No)
+    if (!reqId && saved.id) setTimeout(() => location.href = `form.html?id=${saved.id}`, 900);
+  }
+  $('saveOnlyBtn').addEventListener('click', () => saveOnly($('saveOnlyBtn')));
 
   // ----- populate an existing request -----
   function fill(r){
@@ -723,7 +759,8 @@
   (async () => {
     const me = await fetch('api/me.php');
     if (!me.ok){ location.href = 'index.html'; return; }
-    role = (await me.json()).user.role;
+    const meUser = (await me.json()).user;
+    role = meUser.role; myId = meUser.id;
 
     // page 2 (engineer section) is fillable only by engineer/admin — tell others why
     if (!['engineer','admin'].includes(role)) $('engNotice').hidden = false;
@@ -731,14 +768,31 @@
     if (reqId){
       const res = await fetch('api/request_get.php?id=' + encodeURIComponent(reqId));
       if (!res.ok){ toast('ไม่พบรายการ', false); return; }
-      fill((await res.json()).request);
-      lock(PAGE1);                                  // page 1 locked once submitted
-      if (!['engineer','admin'].includes(role)){    // requester views only
-        lock(PAGE2); $('saveBtn').style.display = 'none';
+      const req = (await res.json()).request;
+      fill(req);
+      const isEng   = ['engineer','admin'].includes(role);
+      const isOwner = String(req.created_by) === String(myId);
+      // the owner may still edit their own REQUEST (page 1) while it is Pending
+      ownerEdit = (!isEng && isOwner && req.status === 'pending');
+      if (isEng){
+        lock(PAGE1);                 // engineers fill page 2, not the request half
+        if (role === 'admin') $('recNo').removeAttribute('readonly');   // only admin may edit REC.No
+      } else if (ownerEdit){
+        lock(PAGE2);                 // owner edits page 1; engineer section stays locked
+        // REC.No stays read-only — editable by admin only
+      } else {
+        lock(PAGE1); lock(PAGE2);                                       // view only
+        $('saveBtn').style.display = 'none'; $('saveOnlyBtn').style.display = 'none';
       }
     } else {
       $('reqDate').valueAsDate = new Date();
-      $('recNo').value = '(สร้างอัตโนมัติเมื่อบันทึก)';
+      // suggest the next REC.No (editable) by peeking the latest number
+      $('recNo').value = 'กำลังดึงเลข…';
+      try {
+        const rn = await fetch('api/rec_next.php');
+        $('recNo').value = rn.ok ? ((await rn.json()).rec_no || '') : '';
+      } catch { $('recNo').value = ''; }
+      if (role === 'admin') $('recNo').removeAttribute('readonly');   // only admin may edit the suggested REC.No
       // single A4: engineer section is filled later by an engineer, so it stays
       // locked for ordinary requesters — but engineers/admins may fill it in one pass.
       if (!['engineer','admin'].includes(role)) lock(PAGE2);

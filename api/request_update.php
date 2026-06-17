@@ -47,6 +47,18 @@ $stmt->execute([
     $id,
 ]);
 
+// REC.No may be changed by ADMIN only (duplicates allowed but warned)
+$warning = null;
+if ($user['role'] === 'admin' && array_key_exists('rec_no', $d)) {
+    $recNo = trim((string)$d['rec_no']);
+    if ($recNo !== '') {
+        $chk = db()->prepare('SELECT 1 FROM requests WHERE rec_no = ? AND id <> ? LIMIT 1');
+        $chk->execute([$recNo, $id]);
+        if ($chk->fetch()) $warning = 'เตือน: REC.No ' . $recNo . ' ซ้ำกับใบอื่น (บันทึกแล้ว)';
+        db()->prepare('UPDATE requests SET rec_no = ? WHERE id = ?')->execute([$recNo, $id]);
+    }
+}
+
 // replace equipment rows
 if (isset($d['equipment']) && is_array($d['equipment'])) {
     db()->prepare('DELETE FROM request_equipment WHERE request_id = ?')->execute([$id]);
@@ -79,4 +91,4 @@ try {
     }
 } catch (Throwable $e) { /* non-critical */ }
 
-json_out(['ok' => true]);
+json_out(['ok' => true, 'warning' => $warning]);
