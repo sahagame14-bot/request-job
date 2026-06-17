@@ -43,8 +43,10 @@ try {
     $canEng = in_array($user['role'], ['engineer', 'admin'], true);
     $flag   = ($canEng && in_array(($d['schedule_flag'] ?? ''), ['on_schedule','no_schedule'], true))
               ? $d['schedule_flag'] : null;
+    // a freshly submitted request starts as Waiting (awaiting engineer action);
+    // engineer/admin may override with an explicit status in the same pass
     $status = ($canEng && in_array(($d['status'] ?? ''), ['pending','receive','waiting','finish','cancel'], true))
-              ? $d['status'] : 'pending';
+              ? $d['status'] : 'waiting';
 
     // ----- insert request -----
     $stmt = $pdo->prepare(

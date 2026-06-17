@@ -471,6 +471,10 @@
   $m('m_save').addEventListener('click', async () => {
     if (!curId) return;
     const btn = $m('m_save'); btn.disabled = true; const old = btn.textContent; btn.textContent = 'กำลังบันทึก…';
+    // a saved report (operation detail / finish date) advances an open job to "Receive"
+    const hasReport = !!($m('m_operation').value.trim() || $m('m_finish').value);
+    let status = $m('m_status').value;
+    if (hasReport && (status === 'waiting' || status === 'pending')) status = 'receive';
     const payload = {
       id: curId,
       operation_detail: $m('m_operation').value,
@@ -479,7 +483,7 @@
       finish_date:   $m('m_finish').value,
       result_status: $m('m_remark').value,
       for_section:   $m('m_section').value,
-      status:        $m('m_status').value,
+      status:        status,
       // preserve schedule flag/cause set in the full form
       schedule_flag: curRow?.schedule_flag || null,
       schedule_cause: curRow?.schedule_cause || null,
