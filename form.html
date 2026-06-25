@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta http-equiv="Cache-Control" content="no-store, must-revalidate" />
 <title>Request Job — Production Engineer & IT</title>
-<link rel="icon" type="image/png" href="logo.png" />
+<link rel="icon" type="image/x-icon" href="favicon.ico" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -481,7 +481,7 @@
           <div class="sigspace"></div>
           <div style="border-top:1px solid var(--line); text-align:left; padding:2px 0;"><strong>DATE :</strong></div>
           <div class="cap">ASST / MGR.</div>
-          <div style="font-size:10px;">Engineering Department</div>
+          <div style="font-size:10px;">IT Department</div>
         </td>
       </tr>
 
@@ -555,7 +555,7 @@
       <tr class="footer-row">
         <td rowspan="2" style="vertical-align:top; font-weight:700;">
           KATSUYAMA FINTECH (THAILAND CO.,LTD)
-          <div style="margin-top:20px;">ENGINEERING DEPARTMENT</div>
+          <div style="margin-top:20px;">IT Department</div>
         </td>
         <td class="foot-sig"><img class="sig" src="assets/signatures/issue.png" alt="" onerror="this.style.display='none'"></td>
         <td class="foot-sig"><img class="sig" src="assets/signatures/check.png" alt="" onerror="this.style.display='none'"></td>
@@ -789,7 +789,7 @@
   // ----- init -----
   (async () => {
     const me = await fetch('api/me.php');
-    if (!me.ok){ location.href = 'index.html'; return; }
+    if (!me.ok){ location.href = 'http://192.168.42.12/kft-documents/'; return; }
     const meUser = (await me.json()).user;
     role = meUser.role; myId = meUser.id;
 

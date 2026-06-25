@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta http-equiv="Cache-Control" content="no-store, must-revalidate" />
 <title>งานที่ต้องดำเนินการ — Request Job</title>
-<link rel="icon" type="image/png" href="logo.png" />
+<link rel="icon" type="image/x-icon" href="favicon.ico" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=57" />
+<link rel="stylesheet" href="styles.css?v=100" />
 <style>
   /* report action button — gradient capsule */
   .btn-rep{ display:inline-flex; align-items:center; gap:6px; padding:7px 15px; font-size:12.5px;
@@ -103,7 +103,6 @@
       <button class="sb-toggle" id="sbToggle" aria-label="ย่อ/ขยายเมนู" title="ย่อ/ขยายเมนู">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <div class="sb-logo"><img src="logo.png" alt="KFT" /></div>
       <div class="sb-brand">ENGINEERING</div>
       <div class="sb-sub">Request Job System</div>
     </div>
@@ -136,7 +135,7 @@
         <span>จัดการผู้ใช้</span>
       </a>
     </nav>
-    <div class="sb-foot">Engineering Dept, KFT<br>&copy; 2026</div>
+    <div class="sb-foot">IT Dept, KFT<br>&copy; 2026</div>
   </aside>
 
   <!-- ===== Main ===== -->
@@ -149,6 +148,7 @@
     <div class="spacer"></div>
     <div id="notif-bell"></div>
     <div class="who" id="who"></div>
+    <a class="btn-home" href="http://192.168.42.12/kft-documents/home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>หน้าหลัก</a>
     <button class="btn ghost" id="logoutBtn">ออกจากระบบ</button>
   </header>
 
@@ -282,7 +282,7 @@
   // guard: engineer/admin only
   let myRole = 'engineer';
   fetch('api/me.php').then(async r => {
-    if (!r.ok) { location.href = 'index.html'; return; }
+    if (!r.ok) { location.href = 'http://192.168.42.12/kft-documents/'; return; }
     const { user } = await r.json();
     if (!['engineer','admin'].includes(user.role)) { location.href = 'dashboard.html'; return; }
     myRole = user.role;
@@ -301,7 +301,7 @@
   });
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await fetch('api/logout.php'); location.href = 'index.html';
+    await fetch('api/logout.php'); location.href = 'http://192.168.42.12/kft-documents/';
   });
 
   const rowsEl = document.getElementById('rows');
@@ -319,7 +319,7 @@
               + `&page=${curPage}&per_page=${curPerPage}`;
     try {
       const res = await fetch(url);
-      if (!res.ok) { location.href = 'index.html'; return; }
+      if (!res.ok) { location.href = 'http://192.168.42.12/kft-documents/'; return; }
       const { rows, counts, total, pages } = await res.json();
       document.getElementById('c_total').textContent = counts.total ?? 0;
       document.getElementById('c_pending').textContent = counts.pending ?? 0;

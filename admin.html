@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-store, must-revalidate" />
   <title>Admin Panel — Request Job</title>
-  <link rel="icon" type="image/png" href="logo.png" />
-  <link rel="stylesheet" href="styles.css?v=57" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" href="styles.css?v=100" />
   <style>body{visibility:hidden}</style>
 </head>
 <body class="app">
@@ -17,7 +17,6 @@
       <button class="sb-toggle" id="sbToggle" aria-label="ย่อ/ขยายเมนู" title="ย่อ/ขยายเมนู">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <div class="sb-logo"><img src="logo.png" alt="KFT" /></div>
       <div class="sb-brand">ENGINEERING</div>
       <div class="sb-sub">Request Job System</div>
     </div>
@@ -50,7 +49,7 @@
         <span>จัดการผู้ใช้</span>
       </a>
     </nav>
-    <div class="sb-foot">Engineering Dept, KFT<br>&copy; 2026</div>
+    <div class="sb-foot">IT Dept, KFT<br>&copy; 2026</div>
   </aside>
 
   <!-- ===== Main ===== -->
@@ -66,6 +65,7 @@
           <div class="user-avatar" id="userAvatar">A</div>
           <span id="userDisplay">Admin</span>
         </div>
+        <a class="btn-home" href="http://192.168.42.12/kft-documents/home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>หน้าหลัก</a>
         <button class="btn-logout" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
       </div>
     </div>
@@ -205,8 +205,8 @@
     const App = {
       user: null,
       async requireAdmin(){
-        let r; try { r = await fetch('api/me.php'); } catch { location.href = 'index.html'; return null; }
-        if (!r.ok) { location.href = 'index.html'; return null; }
+        let r; try { r = await fetch('api/me.php'); } catch { location.href = 'http://192.168.42.12/kft-documents/'; return null; }
+        if (!r.ok) { location.href = 'http://192.168.42.12/kft-documents/'; return null; }
         const { user } = await r.json();
         if (user.role !== 'admin') { location.href = 'dashboard.html'; return null; }
         this.user = user;
@@ -223,7 +223,7 @@
       updateUser(id, p){ return fetch('api/user_update.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.assign({ id }, p)) }); },
       deleteUser(id){ return fetch('api/user_delete.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ id }) }); },
     };
-    function logout(){ fetch('api/logout.php').then(() => location.href = 'index.html'); }
+    function logout(){ fetch('api/logout.php').then(() => location.href = 'http://192.168.42.12/kft-documents/'); }
 
     let users = [];
     let editingId = null;
