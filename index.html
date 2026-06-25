@@ -12,8 +12,8 @@
   // SSO: login อยู่ (bridge เซ็ต uid ให้) → เข้า dashboard, ยังไม่ login → ไป KFT login
   // (เดิมเด้งกลับ home ทันทีแบบไม่มีเงื่อนไข เลยเข้า request-job ไม่ได้)
   fetch('api/me.php', { credentials: 'same-origin' })
-    .then(r => location.replace(r.ok ? 'dashboard.html' : 'http://192.168.42.12/kft-documents/login.html'))
-    .catch(() => location.replace('http://192.168.42.12/kft-documents/login.html'));
+    .then(r => location.replace(r.ok ? 'dashboard.html' : '/kft-documents/login.html'))
+    .catch(() => location.replace('/kft-documents/login.html'));
 </script>
 
   <div class="auth-container" id="authContainer">

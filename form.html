@@ -789,7 +789,7 @@
   // ----- init -----
   (async () => {
     const me = await fetch('api/me.php');
-    if (!me.ok){ location.href = 'http://192.168.42.12/kft-documents/'; return; }
+    if (!me.ok){ location.href = '/kft-documents/'; return; }
     const meUser = (await me.json()).user;
     role = meUser.role; myId = meUser.id;
 
