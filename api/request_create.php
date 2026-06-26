@@ -7,25 +7,28 @@ $d = body();
 $pdo = db();
 $pdo->beginTransaction();
 try {
-    // ----- generate REC.No  (RJE-{YEAR}{4-digit seq}) -----
+    // ----- generate REC.No  (RJE-{YEAR}{MONTH 2 หลัก}{SEQ 3 หลัก} เช่น RJE-202606044) -----
+    // seq เป็นรายปี (รีเซ็ตตอนขึ้นปีใหม่) — เดือนเป็นแค่ส่วนแสดงผลตามเดือนที่สร้าง
     // Self-healing & atomic: advance the counter to at least the highest
     // existing rec_no for the year, so seeded/direct-inserted rows never collide.
-    $year = (int) date('Y');
-    $like = 'RJE-' . $year . '%';
+    // SUBSTRING รู้ความยาว: เลขเก่า len 12 → ตัดจาก 9 / เลขใหม่ len 13+ → ตัดจาก 11
+    $year  = (int) date('Y');
+    $month = (int) date('m');
+    $like  = 'RJE-' . $year . '%';
     $pdo->prepare('INSERT INTO rec_counter (year, last_seq) VALUES (?,0)
                    ON DUPLICATE KEY UPDATE year = year')->execute([$year]);
     $pdo->prepare(
         'UPDATE rec_counter
             SET last_seq = GREATEST(
                   last_seq,
-                  COALESCE((SELECT MAX(CAST(SUBSTRING(rec_no, 9) AS UNSIGNED))
+                  COALESCE((SELECT MAX(CAST(SUBSTRING(rec_no, IF(LENGTH(rec_no) >= 13, 11, 9)) AS UNSIGNED))
                               FROM requests WHERE rec_no LIKE ?), 0)
                 ) + 1
           WHERE year = ?'
     )->execute([$like, $year]);
     $seq = (int) $pdo->query('SELECT last_seq FROM rec_counter WHERE year = ' . $year)
                      ->fetchColumn();
-    $recNo = sprintf('RJE-%d%04d', $year, $seq);
+    $recNo = sprintf('RJE-%d%02d%03d', $year, $month, $seq);
 
     // only an admin may override the auto REC.No; everyone else gets the sequential one.
     // duplicates are allowed (not blocked) but flagged back as a warning.
