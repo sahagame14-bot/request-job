@@ -154,6 +154,13 @@
     background-position:0 6px;       /* align first rule with the first text line */
   }
 
+  /* จำกัดข้อความให้อยู่ในกรอบ: ปิด scrollbar ถาวร + กรอบแดงเตือนตอนพิมพ์เต็ม */
+  #detail, #operationDetail{ overflow:hidden; }
+  #detail.cap-full, #operationDetail.cap-full{
+    box-shadow:inset 0 0 0 2px #dc2626, 0 0 0 2px rgba(220,38,38,.25) !important;
+    transition:box-shadow .1s;
+  }
+
   .band{
     background:linear-gradient(180deg,#e4e7ec,#d3d7de); text-align:center; font-weight:800;
     letter-spacing:.5px; color:#374151;
@@ -856,6 +863,33 @@
   window.safePrint = () => saveAndPrint(null);
 
   ['reqDate','dueDate','dateReceived','scheduleDate','finishDate'].forEach(DatePicker.attach);
+
+  // ----- จำกัดข้อความให้อยู่ในกรอบ (DETAIL / OPERATION DETAIL) -----
+  // พิมพ์จนเต็มกรอบแล้วล็อก พิมพ์ต่อไม่ติด + กรอบแดง + เตือน (ไม่มี scroll) — แต่ยังลบ/แก้ได้ปกติ
+  (function capTextareasToBox(){
+    let warnAt = 0;
+    const warn = ta => {
+      ta.classList.add('cap-full');                       // กรอบแดง
+      clearTimeout(ta._capT);
+      ta._capT = setTimeout(() => ta.classList.remove('cap-full'), 900);
+      const now = Date.now();
+      if (now - warnAt > 1500){ warnAt = now; toast('⚠ ข้อความเต็มกรอบแล้ว พิมพ์เพิ่มไม่ได้', false); }
+    };
+    const cap = ta => {
+      if (!ta) return;
+      let prev = ta.value;
+      ta.addEventListener('beforeinput', () => { prev = ta.value; });
+      ta.addEventListener('input', () => {
+        if (ta.scrollHeight > ta.clientHeight + 1){        // เนื้อหาเกินกรอบ → คืนค่าก่อนพิมพ์ + เตือน
+          const pos = Math.max(0, ta.selectionStart - 1);
+          ta.value = prev;
+          try { ta.setSelectionRange(pos, pos); } catch {}
+          warn(ta);
+        }
+      });
+    };
+    ['detail','operationDetail'].forEach(id => cap(document.getElementById(id)));
+  })();
 </script>
 </body>
 </html>
